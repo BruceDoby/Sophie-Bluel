@@ -9,6 +9,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap" rel="stylesheet">
 	<meta name="description" content="">
 	<link rel="stylesheet" href="./assets/style.css">
+	<script src="script.js" defer></script>
 </head>
 <body>
 <header>
@@ -36,8 +37,26 @@
 	</section>
 	<section id="portfolio">
 		<h2>Mes Projets</h2>
+		<div class="filters">
+			<input class="toHide" type="checkbox" id="checked1">
+            <label for="checked1">
+			    <span class="filter__border border__one">Tous</span>
+			</label>
+			<input class="toHide" type="checkbox" id="checked2">
+            <label for="checked2">
+			    <span class="filter__border border__two">Objets</span>
+			</label>
+			<input class="toHide" type="checkbox" id="checked3">
+            <label for="checked3">
+			    <span class="filter__border border__three">Appartements</span>
+			</label>
+			<input class="toHide" type="checkbox" id="checked4">
+            <label for="checked4">
+			    <span class="filter__border border__four">Hotels & restaurants</span>
+			</label>
+		</div>
 		<div class="gallery">
-			<figure>
+			<!--<figure>
 				<img src="assets/images/abajour-tahina.png" alt="Abajour Tahina">
 				<figcaption>Abajour Tahina</figcaption>
 			</figure>
@@ -80,7 +99,7 @@
 			<figure>
 				<img src="assets/images/hotel-first-arte-new-delhi.png" alt="Hotel First Arte - New Delhi">
 				<figcaption>Hotel First Arte - New Delhi</figcaption>
-			</figure>
+			</figure>-->
 		</div>
 	</section>
 	<section id="contact">

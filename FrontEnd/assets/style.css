@@ -125,6 +125,64 @@ li:hover {
 	text-align: center;
 	margin-bottom: 1em;
 }
+
+.filters {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	font-size: 18px;
+	font-weight: 700;
+	color: #1D6154;
+	margin-top: 50px;
+	margin-bottom: 50px;
+	margin-right: 25px;
+}
+
+.filter__border {
+	display: flex;
+	border: 1px solid #1D6154;
+	border-radius: 60px;
+	padding: 10px;
+	margin-left: 5px;
+	margin-right: 5px;
+	align-items: center;
+	justify-content: center;
+}
+
+.filter__border:hover {
+	cursor: pointer;
+}
+
+/*.filter__border:active {
+	background-color: #1D6154;
+	color: white;
+}*/
+
+.border__one {
+	width: 100px;
+}
+
+.border__two {
+	width: 100px;
+}
+
+.border__three {
+	width: 157px;
+}
+
+.border__four {
+	width: 198px;
+}
+
+.toHide {
+	display: none;
+}
+
+.toHide:checked + label .filter__border {
+	background-color: #1D6154;
+	color: white;
+}
+
 .gallery {
 	width: 100%;
 	display: grid;
