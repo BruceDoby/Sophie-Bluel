@@ -67,6 +67,155 @@ async function chargerGalerie() {
     console.warn("Aucun travail n'a été récupéré depuis l'API.");
   }
 }
-// Ici l'eventListener permet d'écouter le chargement de la page pour executer la fonction chargerGalerie, DOMContentLoaded permet d'attendre
-// que la page soit prête pour executer le code
-document.addEventListener('DOMContentLoaded', chargerGalerie);
+
+/*document.addEventListener('DOMContentLoaded', chargerGalerie);*/
+
+// Ici la fonction genererFiltres, comme son nom l'indique, va générer les boutons des filtres, c'est une fonction asynchrone comme les autres
+// au dessus, on a également une nodelist qui sélectionne la div ayant la classe .filters et fetchCategories récupère la liste des catégories
+// pour pouvoir créer les boutons
+async function genererFiltres() {
+  const filtersContainer = document.querySelector('.filters');
+  const categories = await fetchCategories();
+
+  // Vider le conteneur avant d'ajouter les nouveaux boutons
+  filtersContainer.innerHTML = '';
+
+  // Le tableau buttonsWidth permets de relier les tailles de chaque boutons disponible depuis le css dans le code javascript
+  const buttonsWidth = {
+    'Tous': 'border__one',
+    'Objets': 'border__two',
+    'Appartements': 'border__three',
+    'Hotels & restaurants': 'border__four',
+  };
+
+  // Cette partie permets de créer un bouton pour chaque catégories ayant été récupérés, on crée alors un élément "button" pour chaque bouton
+  // donc, les deux lignes suivantes, button.textContent permets de nommer le bouton selon sa catégories et button.dataset.categoryId permet
+  // de donner une id à button comme si on mettait directement une id à un élément dans le html, attention cependant dataset est une propriété
+  // javascript alors que categoryId est un élément personnalisé que je pourrais très bien modifier
+  categories.forEach((category) => {
+    const button = document.createElement('button');
+    button.textContent = category.name;
+    button.dataset.categoryId = category.id;
+
+    // Ici button.classList.add permets d'ajouter les propriétés de base présent dans le css à chaque bouton avec filter__border ainsi que
+    // leur taille spécifique à chacun avec buttonsWidth, || 'border__one' est utilisé comme valeur de taille par défaut dans le cas où
+    // un bouton n'aurait pas de taille spécifique, je l'ai mis car ça m'a été conseillé mais je ne sais pas vraiment si c'est si utile
+    button.classList.add('filter__border', buttonsWidth[category.name] || 'border__one');
+
+    // Ici c'est le style des boutons de bases, qui ne sont pas cochés, ces propriétés ont le même effet que leur équivalent du même nom
+    // en css
+    button.style.backgroundColor = 'white';
+    button.style.color = '#1D6154';
+    button.style.fontFamily = 'Syne'
+    button.style.fontWeight = '700'
+
+    // Ici un event listener est créé pour qu'au clique l'on puissé vérifié si le bouton a déjà la class active (présent plus en bas) et est
+    // donc actif, si oui alors rien ne change grâce au return, si non, les lignes plus en bas se charge des changements
+    button.addEventListener('click', () => {
+      if (button.classList.contains('active')) {
+        return;
+      }
+
+      // Ici tout les buttons dans la div filters sont sélectionnés pour que grâce à la nodelist et à forEach pour qu'ils aient tous par
+      // défaut le style css du dessous (sauf le bouton Tous, à voir plus bas) dans le cas où active est removed, et dans le cas où il
+      // est add, alors les lignes encore en dessous change le style de celui-ci, y compris le bouton Tous si celui ci n'est plus cliqué
+      document.querySelectorAll('.filters button').forEach((button) => {
+        button.style.backgroundColor = 'white';
+        button.style.color = '#1D6154';
+        button.classList.remove('active');
+      });
+
+      button.style.backgroundColor = '#1D6154';
+      button.style.color = 'white';
+      button.classList.add('active');
+
+      // Ici la fontion se chargera d'appliquer les filtres comme son nom l'indique, elle établie plus en bas
+      appliquerFiltre(category.id);
+    });
+
+    // Comme plus haut, l'appendChild permet de relier les boutons à la div filters
+    filtersContainer.appendChild(button);
+  });
+
+  // Ici le bouton Tous est défini comme par défaut (comme selon la maquette) grâce à plusieurs éléments, d'abord avec une nodelist on sélectionne
+  // un élément directement dans filtersContainer pour plus de précision, on sélectionne précisèment le bouton avec une id "null" (qui est
+  // donc "Tous" puisqu'il n'a pas de catégories spécifique), on lui applique un style spécifique et on lui add active puis on lui applique
+  // le filtre comme vu au dessus
+  const defaultButton = filtersContainer.querySelector('button[data-category-id="null"]');
+  if (defaultButton) {
+    defaultButton.style.backgroundColor = '#1D6154';
+    defaultButton.style.color = 'white';
+    defaultButton.classList.add('active');
+    appliquerFiltre(defaultButton.dataset.categoryId);
+  }
+}
+
+// Ici cette fonction permets de récupérer les infos des catégories depuis l'API, comme expliquer précédemment try, catch permettent d'intercepter
+// les potentielles erreurs et la const response envoi la requête à l'API pour récupérer les données, la condition if en dessous signifie
+// concrètement que si la response n'est pas "ok" alors une erreur incluant le statut http est donnée grâce à throw qui permets de définir
+// une exception en utilisant new Error pour créer une Erreur concrètement et la const works ici récupère les données de l'API qu'elle
+// converti en json pour les stocker pour pouvoir les utiliser dans le code javascript
+async function fetchCategories() {
+  try {
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP : ${response.status}`);
+    }
+    const works = await response.json();
+
+    // Ici on utilise Array.from pour convertir des données du Set en un tableau, Set servant lui même à faire en sorte que les catégories
+    // créé soit unique et qu'il n'y en ait pas 1 pour chaque élément, works.map sert à créer un tableau qui contiendra les noms de chaque 
+    // catégorie avec work.category.name, .map permets ensuite de créer un objet (ici l'objet en question est une structure de donnée qui
+    // regroupera le nom de la catégorie et son id) pour chaque noms de catégories, le return permettra de renvoyer l'objet pour créer
+    // un nouveau tableau grâce à .map, il est donc indiqué en dessous que ce qui sera retourné donc est le nom avec name: name (il ne
+    // faut pas oublier de faire la différence entre les deux, celui de gauche est la propriétés de l'objets et celui de droite est une
+    // variable que j'ai appelée name, qui est donc le nom de la catégorie)
+    // en dessous, pour l'id, works.find permet de parcourir le tableau qu'est works qui a été récupéré par l'API, ensuite work.category.name
+    // et name seront comparé grâce à l'opérateur === dans le but de trouver l'élément dont la catégorie a le même nom de name pour ensuite
+    // récupérer l'id associé qu'est categoryId
+    const categories = Array.from(
+      new Set(works.map((work) => work.category.name))
+    ).map((name) => {
+      return {
+        name: name,
+        id: works.find((work) => work.category.name === name).categoryId,
+      };
+    });
+
+    // Le return juste en dessous permet de créer un nouveau tableau que le return renverra donc, qui contient ici un objet supplémentaire
+    // pour le bouton Tous dans le but de faire en sorte que l'objet avec nom Tous ai un id null, et l'opérateur de décomposition "..."
+    // permet en gros de fusionner le Tous avec les autres catégories récupérés depuis l'API
+    // le catch (error) permets donc de capturer la potentielle erreur, si c'est le cas un message d'erreur est affiché et dans ce cas
+    // le return renvoie le tableau avec uniquement Tous pour éviter que ça plante
+    return [{ name: "Tous", id: null }, ...categories];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des catégories :', error);
+    return [{ name: "Tous", id: null }];
+  }
+}
+
+// Cette fonction sert à appliquer le filtre des catégories en fonction de quel catégorie a été choisi, pour ça, categoryId est utilisé 
+// pour représenter l'ID de la catégorie sélectionnée pour appliquer le filtre, la ligne du dessous, comme vu précédemment récupère les
+// données de l'API
+async function appliquerFiltre(categoryId) {
+  const works = await fetchWorks();
+
+  // Ici pour filtrer en fonction de la catégorie sélectionnée, on va utiliser un opérateur ternaire, ? correspondant à "si" et : à "sinon"
+  // dans ce cas précis, cette partie du code signifie concrètement que si la condition (categoryId étant la condition) est vraie et donc
+  //  que categoryId exuste, alors le code sera executé et les éléments seront filtrés, mais sinon (si la condition est fausse donc null) 
+  // alors le code sera également executé mais les éléments ne seront pas filtré
+  const filteredWorks = categoryId
+    ? works.filter((work) => work.categoryId === categoryId)
+    : works;
+
+  // Ici afficherWorks permets ainsi d'afficher les éléments filtrés (ou non en fonction de ce qui a été vu juste au dessus)
+  afficherWorks(filteredWorks);
+}
+
+// Ici l'eventListener permet d'écouter le chargement de la page pour executer les fonctions chargerGalerie et genererFiltres, 
+// DOMContentLoaded permet d'attendre que la page soit prête pour executer le code
+document.addEventListener('DOMContentLoaded', async () => {
+  await genererFiltres();
+  await chargerGalerie();
+});
+

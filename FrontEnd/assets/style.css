@@ -153,25 +153,25 @@ li:hover {
 	cursor: pointer;
 }
 
-/*.filter__border:active {
-	background-color: #1D6154;
-	color: white;
-}*/
-
 .border__one {
 	width: 100px;
+	font-size: 16px;
 }
 
 .border__two {
 	width: 100px;
+	font-size: 16px;
 }
 
 .border__three {
 	width: 157px;
+	font-size: 16px;
 }
 
 .border__four {
 	width: 198px;
+	font-size: 16px;
+	padding: 5px;
 }
 
 .toHide {
