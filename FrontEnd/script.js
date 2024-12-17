@@ -23,7 +23,7 @@ async function fetchWorks() {
 }
 
 // Ici la fonction afficherWorks permet d'afficher les éléments pour la div gallery, la ligne juste en dessous est une node list qui sélectionne
-//donc la div gallery
+// donc la div gallery
 function afficherWorks(works) {
   const galerie = document.querySelector('.gallery'); 
 
@@ -104,7 +104,7 @@ async function genererFiltres() {
 
     // Ici c'est le style des boutons de bases, qui ne sont pas cochés, ces propriétés ont le même effet que leur équivalent du même nom
     // en css
-    button.style.backgroundColor = 'white';
+    button.style.backgroundColor = '#fffef8';
     button.style.color = '#1D6154';
     button.style.fontFamily = 'Syne'
     button.style.fontWeight = '700'
@@ -120,7 +120,7 @@ async function genererFiltres() {
       // défaut le style css du dessous (sauf le bouton Tous, à voir plus bas) dans le cas où active est removed, et dans le cas où il
       // est add, alors les lignes encore en dessous change le style de celui-ci, y compris le bouton Tous si celui ci n'est plus cliqué
       document.querySelectorAll('.filters button').forEach((button) => {
-        button.style.backgroundColor = 'white';
+        button.style.backgroundColor = '#fffef8';
         button.style.color = '#1D6154';
         button.classList.remove('active');
       });
@@ -202,7 +202,7 @@ async function appliquerFiltre(categoryId) {
 
   // Ici pour filtrer en fonction de la catégorie sélectionnée, on va utiliser un opérateur ternaire, ? correspondant à "si" et : à "sinon"
   // dans ce cas précis, cette partie du code signifie concrètement que si la condition (categoryId étant la condition) est vraie et donc
-  //  que categoryId exuste, alors le code sera executé et les éléments seront filtrés, mais sinon (si la condition est fausse donc null) 
+  // que categoryId existe, alors le code sera executé et les éléments seront filtrés, mais sinon (si la condition est fausse donc null) 
   // alors le code sera également executé mais les éléments ne seront pas filtré
   const filteredWorks = categoryId
     ? works.filter((work) => work.categoryId === categoryId)
@@ -218,4 +218,3 @@ document.addEventListener('DOMContentLoaded', async () => {
   await genererFiltres();
   await chargerGalerie();
 });
-
