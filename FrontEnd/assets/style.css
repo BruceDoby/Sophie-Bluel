@@ -167,6 +167,8 @@ li:hover {
 	margin-right: 5px;
 	align-items: center;
 	justify-content: center;
+	font-size: 18px;
+	font-weight: 700;
 }
 
 .filter__border:hover {

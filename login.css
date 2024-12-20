@@ -60,6 +60,13 @@ header {
 	margin: 50px 200px;
 }
 
+.error-message {
+	position: relative;
+	bottom: 15px;
+	left: 175px;
+	color: red;
+}
+
 main {
 	max-width: 1140px;
 	margin:auto;

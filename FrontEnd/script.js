@@ -68,8 +68,6 @@ async function chargerGalerie() {
   }
 }
 
-/*document.addEventListener('DOMContentLoaded', chargerGalerie);*/
-
 // Ici la fonction genererFiltres, comme son nom l'indique, va générer les boutons des filtres, c'est une fonction asynchrone comme les autres
 // au dessus, on a également une nodelist qui sélectionne la div ayant la classe .filters et fetchCategories récupère la liste des catégories
 // pour pouvoir créer les boutons
@@ -81,12 +79,12 @@ async function genererFiltres() {
   filtersContainer.innerHTML = '';
 
   // Le tableau buttonsWidth permets de relier les tailles de chaque boutons disponible depuis le css dans le code javascript
-  const buttonsWidth = {
+  /*const buttonsWidth = {
     'Tous': 'border__one',
     'Objets': 'border__two',
     'Appartements': 'border__three',
     'Hotels & restaurants': 'border__four',
-  };
+  };*/
 
   // Cette partie permets de créer un bouton pour chaque catégories ayant été récupérés, on crée alors un élément "button" pour chaque bouton
   // donc, les deux lignes suivantes, button.textContent permets de nommer le bouton selon sa catégories et button.dataset.categoryId permet
@@ -100,7 +98,7 @@ async function genererFiltres() {
     // Ici button.classList.add permets d'ajouter les propriétés de base présent dans le css à chaque bouton avec filter__border ainsi que
     // leur taille spécifique à chacun avec buttonsWidth, || 'border__one' est utilisé comme valeur de taille par défaut dans le cas où
     // un bouton n'aurait pas de taille spécifique, je l'ai mis car ça m'a été conseillé mais je ne sais pas vraiment si c'est si utile
-    button.classList.add('filter__border', buttonsWidth[category.name] || 'border__one');
+    button.classList.add('filter__border', /*buttonsWidth[category.name] || 'border__one'*/);
 
     // Ici c'est le style des boutons de bases, qui ne sont pas cochés, ces propriétés ont le même effet que leur équivalent du même nom
     // en css
@@ -109,9 +107,36 @@ async function genererFiltres() {
     button.style.fontFamily = 'Syne'
     button.style.fontWeight = '700'
 
+    button.addEventListener('click', () => gererClicFiltre(button, category.id));
+
+    // Ici button et categoryID se trouve () dans la fonction car ils sont passé à la fonction pour qu'elle puisse modifier le bouton
+    // spécifiquement dans la fonction, donc le modifier spécifiquement lorsque l'on interragit avec permet à la fonction de le modifier
+    // quant à categoryID, il est passé à la fonction lorsqu'un bouton est cliqué pour que la fonction puisse filtrer les éléments en
+    // fonction de la catégorie pour pouvoir les changer spécifiquement (le vrai filtrage étant effectué par appliquerFiltre)
+    async function gererClicFiltre(button, categoryId) {
+      if (button.classList.contains('active')) {
+        return;
+      }
+    
+      document.querySelectorAll('.filters button').forEach((btn) => {
+        btn.style.backgroundColor = '#fffef8';
+        btn.style.color = '#1D6154';
+        btn.classList.remove('active');
+      });
+    
+      button.style.backgroundColor = '#1D6154';
+      button.style.color = 'white';
+      button.classList.add('active');
+    
+      appliquerFiltre(categoryId);
+
+      /*button.addEventListener('click', () => {
+        gererClicFiltre(button, category.id);
+      });*/
+    }
     // Ici un event listener est créé pour qu'au clique l'on puissé vérifié si le bouton a déjà la class active (présent plus en bas) et est
     // donc actif, si oui alors rien ne change grâce au return, si non, les lignes plus en bas se charge des changements
-    button.addEventListener('click', () => {
+    /*button.addEventListener('click', () => {
       if (button.classList.contains('active')) {
         return;
       }
@@ -131,7 +156,7 @@ async function genererFiltres() {
 
       // Ici la fontion se chargera d'appliquer les filtres comme son nom l'indique, elle établie plus en bas
       appliquerFiltre(category.id);
-    });
+    });*/
 
     // Comme plus haut, l'appendChild permet de relier les boutons à la div filters
     filtersContainer.appendChild(button);
