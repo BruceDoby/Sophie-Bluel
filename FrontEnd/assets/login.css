@@ -52,12 +52,19 @@ body {
 	margin:auto;*/
 	font-family: 'Work Sans' ;
 	font-size: 14px;
-	background-color: #fffef8;
+    background-color: #fffef8;
 }
 header {
 	display: flex;
 	justify-content: space-between;
 	margin: 50px 200px;
+}
+
+.error-message {
+	position: relative;
+	bottom: 15px;
+	left: 175px;
+	color: red;
 }
 
 main {
@@ -67,6 +74,10 @@ main {
 
 section {
 	margin: 50px 0
+}
+
+.login__link {
+    font-weight: 600;
 }
 
 h1{
@@ -91,12 +102,6 @@ h2{
 	font-size: 30px;
 	color: #1D6154
 }
-
-nav a {
-	text-decoration: none;
-	color: black;
-}
-
 nav ul {
 	display: flex;
 	align-items: center;
@@ -146,125 +151,6 @@ li:hover {
 	margin-bottom: 1em;
 }
 
-.edit__on {
-	margin-top: 30px;
-}
-
-/*.center__edit {
-	display: flex;
-	justify-content: center;
-}*/
-
-.edit--mode {
-	/*display: none;*/
-	position: relative;
-	bottom: 162px;
-	background-color: black;
-	color: white;
-	padding-top: 10px;
-	padding-bottom: 10px;
-	margin-bottom: -50px;
-}
-
-.edit--mode p {
-	position: relative;
-	left: 550px;
-	bottom: 7px;
-}
-
-.edit--mode .fa-pen-to-square {
-	position: relative;
-	left: 520px;
-	top: 5px;
-}
-
-.logout {
-	/*display: none;*/
-	cursor: pointer;
-}
-
-.edit {
-	/*display: none;*/
-	position: relative;
-	left: 700px;
-	bottom: 50px;
-	/*margin-bottom: -50px;*/
-}
-
-.edit p {
-	margin-left: 10px;
-	font-weight: 400;
-	font-size: 14px;
-	position: relative;
-	left: 15px;
-	bottom: 15px;
-}
-
-.edit .fa-pen-to-square {
-	font-size: 16px;
-	position: relative;
-	bottom: 3px;
-}
-
-.filters {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	font-size: 18px;
-	font-weight: 700;
-	color: #1D6154;
-	margin-top: 50px;
-	margin-bottom: 50px;
-	margin-right: 25px;
-}
-
-.filter__border {
-	display: flex;
-	border: 1px solid #1D6154;
-	border-radius: 60px;
-	padding: 10px;
-	margin-left: 5px;
-	margin-right: 5px;
-	align-items: center;
-	justify-content: center;
-	font-size: 18px;
-	font-weight: 700;
-}
-
-.filter__border:hover {
-	cursor: pointer;
-}
-
-.border__one {
-	width: 100px;
-	font-size: 16px;
-}
-
-.border__two {
-	width: 100px;
-	font-size: 16px;
-}
-
-.border__three {
-	width: 157px;
-	font-size: 16px;
-}
-
-.border__four {
-	width: 198px;
-	font-size: 16px;
-	padding: 5px;
-}
-
-.toHide {
-	display: none;
-}
-
-.toHide:checked + label .filter__border {
-	background-color: #1D6154;
-	color: white;
-}
-
 .gallery {
 	width: 100%;
 	display: grid;
@@ -277,36 +163,48 @@ li:hover {
 	width: 100%;
 
 }
-#contact {
+
+/****Partie login******/
+#login {
 	width: 50%;
 margin: auto;
 }
-#contact > * {
+#login > * {
 	text-align: center;
 
 }
-#contact h2{
+#login h2{
 	margin-bottom: 20px;
 }
-#contact form {
+#login form {
 	text-align: left;
 	margin-top:30px;
 	display: flex;
 	flex-direction: column;
 }
 
-#contact input {
+#login input {
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
-#contact label {
+#login label {
 	margin: 2em 0 1em 0;
+    position: relative;
+    left: 100px;
 }
-#contact textarea {
-	border: none;
-	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+
+#email {
+    width: 379px;
+    position: relative;
+    left: 100px;
+}
+
+#password {
+    width: 379px;
+    position: relative;
+    left: 100px;
 }
 
 input[type="submit"]{
@@ -320,10 +218,16 @@ input[type="submit"]{
 	border-radius: 60px ;
 }
 
+.forgotten {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 footer {
     background-color: white;
     padding-top: 1px;
     padding-bottom: 1px;
+    margin-top: 400px;
     /*position: relative;
     right: 190px;*/
 }
@@ -333,4 +237,3 @@ footer nav ul {
 	justify-content: flex-end;
 	margin: 2em
 }
-

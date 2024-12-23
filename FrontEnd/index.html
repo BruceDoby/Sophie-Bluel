@@ -10,6 +10,7 @@
 	<meta name="description" content="">
 	<link rel="stylesheet" href="./assets/style.css">
 	<script src="script.js" defer></script>
+	<script src="https://kit.fontawesome.com/3c8a26c88f.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <header>
@@ -18,12 +19,17 @@
 		<ul>
 			<li>projets</li>
 			<li>contact</li>
-			<li><a href="../index.html">login</a></li>
+			<li class="log-in"><a href="./login.html">login</a></li>
+			<li class="logout">logout</li>
 			<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
 		</ul>
 	</nav>
 </header>
 <main>
+	<div class="edit--mode center__edit">
+		<i class="fa-regular fa-pen-to-square"></i>
+		<p>Mode édition</p>
+	</div>
 	<section id="introduction">
 		<figure>
 			<img src="./assets/images/sophie-bluel.png" alt="">
@@ -37,6 +43,10 @@
 	</section>
 	<section id="portfolio">
 		<h2>Mes Projets</h2>
+		<div class="edit">
+			<i class="fa-regular fa-pen-to-square"></i>
+			<p>modifier</p>
+		</div>
 		<div class="filters">
 			<!--<input class="toHide" type="checkbox" id="checked1">
             <label for="checked1">

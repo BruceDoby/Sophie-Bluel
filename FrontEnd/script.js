@@ -243,3 +243,123 @@ document.addEventListener('DOMContentLoaded', async () => {
   await genererFiltres();
   await chargerGalerie();
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Sélectionner les éléments à afficher ou à masquer
+  const editMode = document.querySelector(".edit--mode");
+  const edit = document.querySelector(".edit");
+  const logout = document.querySelector(".logout");
+  const filters = document.querySelector(".filters");
+  const headerNav = document.querySelector("header nav");
+  const headerH1 = document.querySelector("header h1");
+  //const editOn = document.querySelector(".edit__on");
+  const logIn = document.querySelector(".log-in");
+
+  // Vérifier si le token est présent dans le localStorage
+  const authToken = localStorage.getItem("authToken");
+
+  // Fonction pour mettre à jour l'UI en fonction de l'état de connexion
+  function updateUI() {
+      if (authToken) {
+          // Si le token existe l'utilisateur est connecté
+          if (editMode) editMode.style.display = "block"; 
+          if (edit) edit.style.display = "block";
+          if (logout) logout.style.display = "block";
+          if (filters) filters.style.display = "none";
+          if (logIn) logIn.style.display = "none";
+
+          // Ajouter la classe edit__on aux éléments nav et h1
+          if (headerNav) headerNav.classList.add("edit__on");
+          if (headerH1) headerH1.classList.add("edit__on");
+
+          //if (editOn) editOn.style.display = "block"; // Afficher edit__on
+      } else {
+          // Si le token n'existe pas, l'utilisateur n'est pas connecté
+          if (editMode) editMode.style.display = "none";
+          if (edit) edit.style.display = "none";
+          if (logout) logout.style.display = "none";
+          if (filters) filters.style.display = "flex";
+          if (logIn) logIn.style.display = "block";
+
+          // Enlever la classe edit__on des éléments nav et h1
+          if (headerNav) headerNav.classList.remove("edit__on");
+          if (headerH1) headerH1.classList.remove("edit__on");
+
+          //if (editOn) editOn.style.display = "none"; // Masquer edit__on
+      }
+  }
+
+  // Appeler la fonction updateUI pour appliquer les changements au chargement de la page
+  updateUI();
+
+  // Ajouter un événement pour la déconnexion
+  if (logout) {
+      logout.addEventListener("click", () => {
+          // Supprimer le token et mettre à jour l'UI
+          localStorage.removeItem("authToken");
+          updateUI();
+
+          window.location.reload();
+      });
+  }
+});
+
+/*document.addEventListener("DOMContentLoaded", () => {
+  // Sélectionner les éléments à afficher ou à masquer
+  const editMode = document.querySelector(".edit--mode");
+  const edit = document.querySelector(".edit");
+  const logout = document.querySelector(".logout");
+  const filters = document.querySelector(".filters");
+  const headerNav = document.querySelector("header nav");
+  const headerH1 = document.querySelector("header h1");
+  //const editOn = document.querySelector(".edit__on");
+  const logIn = document.querySelector(".log-in");
+
+  // Vérifier si le token est présent dans le localStorage
+  const authToken = localStorage.getItem("authToken");
+
+  // Fonction pour mettre à jour l'UI en fonction de l'état de connexion
+  function updateUI() {
+      if (authToken) {
+          // Si le token existe l'utilisateur est connecté
+          if (editMode) editMode.style.display = "none";
+          if (edit) edit.style.display = "none";
+          if (logout) logout.style.display = "none";
+          if (filters) filters.style.display = "block";
+          if (logIn) logIn.style.display = "block";
+
+          // Enlever la classe edit__on des éléments nav et h1
+          if (headerNav) headerNav.classList.remove("edit__on");
+          if (headerH1) headerH1.classList.remove("edit__on");
+
+          //if (editOn) editOn.style.display = "none"; // Masquer edit__on
+      } else {
+          // Si le token n'existe pas, l'utilisateur n'est pas connecté
+          if (editMode) editMode.style.display = "block"; 
+          if (edit) edit.style.display = "block";
+          if (logout) logout.style.display = "block";
+          if (filters) filters.style.display = "none";
+          if (logIn) logIn.style.display = "none";
+
+          // Ajouter la classe edit__on aux éléments nav et h1
+          if (headerNav) headerNav.classList.add("edit__on");
+          if (headerH1) headerH1.classList.add("edit__on");
+
+          //if (editOn) editOn.style.display = "block"; // Afficher edit__on
+      }
+  }
+
+  // Appeler la fonction updateUI pour appliquer les changements au chargement de la page
+  updateUI();
+
+  // Ajouter un événement pour la déconnexion
+  if (logout) {
+      logout.addEventListener("click", () => {
+          // Supprimer le token et mettre à jour l'UI
+          localStorage.removeItem("authToken");
+          updateUI();
+
+          window.location.reload();
+      });
+  }
+});*/
