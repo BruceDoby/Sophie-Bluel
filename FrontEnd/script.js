@@ -245,54 +245,51 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Sélectionner les éléments à afficher ou à masquer
+  // Ici  les éléments à afficher ou masquer sont sélectionnés
   const editMode = document.querySelector(".edit--mode");
   const edit = document.querySelector(".edit");
   const logout = document.querySelector(".logout");
   const filters = document.querySelector(".filters");
   const headerNav = document.querySelector("header nav");
   const headerH1 = document.querySelector("header h1");
-  //const editOn = document.querySelector(".edit__on");
   const logIn = document.querySelector(".log-in");
 
-  // Vérifier si le token est présent dans le localStorage
+  // Cette const permet de vérifier que le token est bien stocké pour pouvoir le réutiliser pour que les changements soit effectuer en 
+  // fonction de si l'on est connecté ou non
   const authToken = localStorage.getItem("authToken");
 
-  // Fonction pour mettre à jour l'UI en fonction de l'état de connexion
+  // Ici la fonction permet de modifier l'affichage de la page en fonction de si l'on est connecté ou pas (donc en fonction de si le token
+  // est détecté ou non) si oui, l'on peut voir que certains élément sont afficher et d'autre non et inversement sinon
   function updateUI() {
       if (authToken) {
-          // Si le token existe l'utilisateur est connecté
           if (editMode) editMode.style.display = "block"; 
           if (edit) edit.style.display = "block";
           if (logout) logout.style.display = "block";
           if (filters) filters.style.display = "none";
           if (logIn) logIn.style.display = "none";
 
-          // Ajouter la classe edit__on aux éléments nav et h1
           if (headerNav) headerNav.classList.add("edit__on");
           if (headerH1) headerH1.classList.add("edit__on");
 
-          //if (editOn) editOn.style.display = "block"; // Afficher edit__on
       } else {
-          // Si le token n'existe pas, l'utilisateur n'est pas connecté
           if (editMode) editMode.style.display = "none";
           if (edit) edit.style.display = "none";
           if (logout) logout.style.display = "none";
           if (filters) filters.style.display = "flex";
           if (logIn) logIn.style.display = "block";
 
-          // Enlever la classe edit__on des éléments nav et h1
           if (headerNav) headerNav.classList.remove("edit__on");
           if (headerH1) headerH1.classList.remove("edit__on");
 
-          //if (editOn) editOn.style.display = "none"; // Masquer edit__on
       }
   }
 
-  // Appeler la fonction updateUI pour appliquer les changements au chargement de la page
+  // La fonction est appelé pour que les changement soit effectué au chargement de la page
   updateUI();
 
-  // Ajouter un événement pour la déconnexion
+  // Ici l'on ajoute la déconnexion de la page, l'event listener se charge d'écouter si il y a un clique sur le logout, si oui, alors le
+  // token est retiré avec removeItem, l'UI est ainsi actualisé pour que les changements s'opère et la page se recharge pour effectuer
+  // les changements suite à la déconnexion
   if (logout) {
       logout.addEventListener("click", () => {
           // Supprimer le token et mettre à jour l'UI
@@ -304,62 +301,95 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-/*document.addEventListener("DOMContentLoaded", () => {
-  // Sélectionner les éléments à afficher ou à masquer
-  const editMode = document.querySelector(".edit--mode");
-  const edit = document.querySelector(".edit");
-  const logout = document.querySelector(".logout");
-  const filters = document.querySelector(".filters");
-  const headerNav = document.querySelector("header nav");
-  const headerH1 = document.querySelector("header h1");
-  //const editOn = document.querySelector(".edit__on");
-  const logIn = document.querySelector(".log-in");
+/**************MODALE***************/
+const modifierButton = document.querySelector('.edit');
+const ajouterPhotoButton = document.querySelector('.button__pictures');
+const arrowRightButton = document.querySelector('.fa-arrow-left');
+const closeModaleButton = document.querySelector('#cross--m');
+const closeModaleAddingButton = document.querySelector('#cross--madding');
+const modale = document.querySelector('.modale');
+const modaleAdding = document.querySelector('.modale__adding');
+const overlay = document.querySelector('.overlay');
+const galleryModale = document.querySelector('.galery__modale');
 
-  // Vérifier si le token est présent dans le localStorage
-  const authToken = localStorage.getItem("authToken");
+function showModale(modaleToShow) {
+    modaleToShow.style.display = 'flex';
+    overlay.style.display = 'block';
+}
 
-  // Fonction pour mettre à jour l'UI en fonction de l'état de connexion
-  function updateUI() {
-      if (authToken) {
-          // Si le token existe l'utilisateur est connecté
-          if (editMode) editMode.style.display = "none";
-          if (edit) edit.style.display = "none";
-          if (logout) logout.style.display = "none";
-          if (filters) filters.style.display = "block";
-          if (logIn) logIn.style.display = "block";
+function hideModale(modaleToHide) {
+    modaleToHide.style.display = 'none';
+    overlay.style.display = 'none';
+}
 
-          // Enlever la classe edit__on des éléments nav et h1
-          if (headerNav) headerNav.classList.remove("edit__on");
-          if (headerH1) headerH1.classList.remove("edit__on");
+async function fetchImages() {
+    try {
+        const response = await fetch(apiUrl); // Remplacez par l'URL réelle de l'API
+        if (!response.ok) {
+            throw new Error('Erreur lors de la récupération des images');
+        }
+        const images = await response.json();
+        generateGallery(images);
+    } catch (error) {
+        console.error('Erreur :', error);
+    }
+}
 
-          //if (editOn) editOn.style.display = "none"; // Masquer edit__on
-      } else {
-          // Si le token n'existe pas, l'utilisateur n'est pas connecté
-          if (editMode) editMode.style.display = "block"; 
-          if (edit) edit.style.display = "block";
-          if (logout) logout.style.display = "block";
-          if (filters) filters.style.display = "none";
-          if (logIn) logIn.style.display = "none";
+// Afficher la modale principale lors du clic sur "Modifier"
+modifierButton.addEventListener('click', () => {
+    showModale(modale);
+    fetchImages(); // Charger les images lorsque la modale principale s'affiche
+});
 
-          // Ajouter la classe edit__on aux éléments nav et h1
-          if (headerNav) headerNav.classList.add("edit__on");
-          if (headerH1) headerH1.classList.add("edit__on");
+// Afficher la modale d'ajout de photo et cacher la modale principale
+ajouterPhotoButton.addEventListener('click', () => {
+    hideModale(modale);
+    showModale(modaleAdding);
+});
 
-          //if (editOn) editOn.style.display = "block"; // Afficher edit__on
-      }
-  }
+// Revenir à la modale principale depuis la modale d'ajout de photo
+arrowRightButton.addEventListener('click', () => {
+    hideModale(modaleAdding);
+    showModale(modale);
+});
 
-  // Appeler la fonction updateUI pour appliquer les changements au chargement de la page
-  updateUI();
+// Fermer la modale principale
+closeModaleButton.addEventListener('click', () => {
+    hideModale(modale);
+});
 
-  // Ajouter un événement pour la déconnexion
-  if (logout) {
-      logout.addEventListener("click", () => {
-          // Supprimer le token et mettre à jour l'UI
-          localStorage.removeItem("authToken");
-          updateUI();
+// Fermer la modale d'ajout de photo
+closeModaleAddingButton.addEventListener('click', () => {
+    hideModale(modaleAdding);
+});
 
-          window.location.reload();
-      });
-  }
-});*/
+// Fermer la modale en cliquant sur l'overlay
+overlay.addEventListener('click', () => {
+    if (modale.style.display === 'flex') {
+        hideModale(modale);
+    } else if (modaleAdding.style.display === 'flex') {
+        hideModale(modaleAdding);
+    }
+});
+
+// Générer dynamiquement les images et l'icône de suppression dans la galerie de la modale
+function generateGallery(images) {
+  const galleryModale = document.querySelector('.galery__modale');
+
+    galleryModale.innerHTML = ''; // Réinitialiser la galerie
+
+    images.forEach(image => {
+        const imageContainer = document.createElement('figure');
+
+        const imgElement = document.createElement('img');
+        imgElement.src = image.url;
+        imgElement.alt = image.alt;
+        imageContainer.appendChild(imgElement);
+
+        const trashIcon = document.createElement('i');
+        trashIcon.className = 'fa-solid fa-trash-can';
+        imageContainer.appendChild(trashIcon);
+
+        galleryModale.appendChild(imageContainer);
+    });
+}

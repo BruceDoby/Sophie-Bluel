@@ -25,7 +25,44 @@
 		</ul>
 	</nav>
 </header>
+<aside class="modale">
+	<div>
+		<a id="cross--m"><i class="fa-solid fa-xmark"></i></a>
+		<h2>Galerie photo</h2>
+		<div class="galery__modale"></div>
+		<a class="button__pictures">Ajouter une photo</a>
+	</div>
+</aside>
+<aside class="modale__adding">
+	<div>
+		<a id="cross--madding"><i class="fa-solid fa-xmark"></i></a>
+		<a><i class="fa-solid fa-arrow-left"></i></a>
+		<h2>Ajout photo</h2>
+		<div class="picture__adding">
+			<i class="fa-regular fa-image"></i>
+			<label for="add-photo">+ Ajouter une photo</label>
+			<input type="file" name="add-photo" id="add-photo">
+			<p>jpg, png : 4mo max</p>
+		</div>
+		<div class="titre--groupe">
+			<label for="titre">Titre</label>
+			<input class="title" type="text" name="titre" id="titre">
+		</div>
+		<div class="categorie--groupe">
+			<label for="categorie">Catégorie</label>
+			<select name="categorie" id="categorie">
+				<option value="1"></option>
+				<option value="2">Objets</option>
+				<option value="3">Appartements</option>
+				<option value="4">Hôtels & restaurants</option>
+			</select>
+		</div>
+		<div class="border__decorative"></div>
+		<a class="button__validate">Valider</a>
+	</div>
+</aside>
 <main>
+	<div class="overlay"></div>
 	<div class="edit--mode center__edit">
 		<i class="fa-regular fa-pen-to-square"></i>
 		<p>Mode édition</p>

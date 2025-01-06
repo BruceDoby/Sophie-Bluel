@@ -60,13 +60,247 @@ header {
 	margin: 50px 200px;
 }
 
-main {
+main section {
 	max-width: 1140px;
 	margin:auto;
+	padding-bottom: 50px;
 }
 
 section {
 	margin: 50px 0
+}
+
+.overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 3;
+}
+
+.fa-trash-can {
+	color: white;
+	background-color: black;
+	height: 14px;
+	width: 12.5px;
+	padding: 5px;
+	border-radius: 2px;
+}
+
+.modale {
+	display: none;
+	justify-content: center;
+	z-index: 5;
+	background-color: white;
+	height: 688px;
+	width: 630px;
+	position: relative;
+	left: 450px;
+	top: 500px;
+	margin-bottom: -688px;
+	border-radius: 10px;
+}
+
+.modale h2 {
+	position: relative;
+	left: 30px;
+	top: 40px;
+	font-size: 26px;
+	font-weight: 400;
+	color: black;
+	font-family: 'Work Sans';
+}
+
+.fa-xmark {
+	cursor: pointer;
+	position: relative;
+	top: 20px;
+	left: 390px;
+	font-size: 18px;
+}
+
+.fa-arrow-left {
+	cursor: pointer;
+	position: relative;
+	top: 20px;
+	right: 95px;
+	font-size: 18px;
+}
+
+.galery__modale {
+	position: relative;
+	top: 75px;
+	border-bottom: 1px solid #b3b3b3;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}
+
+.galery__modale img {
+	width: 76.61px;
+	height: 102.06px;
+}
+
+.galery__modale img .fa-trash-can {
+	display: flex;
+	justify-content: left;
+	align-items: start;
+}
+
+.button__pictures {
+	cursor: pointer;
+	position: relative;
+	top: 570px;
+	border-radius: 60px;
+	background-color: #1D6154;
+	color: white;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 53px;
+	padding-right: 53px;
+	font-weight: 700;
+	font-size: 14px;
+	width: 237px;
+}
+
+.modale__adding {
+	display: none;
+	justify-content: center;
+	z-index: 10;
+	background-color: white;
+	height: 688px;
+	width: 630px;
+	position: relative;
+	left: 450px;
+	top: 500px;
+	margin-bottom: -688px;
+	border-radius: 10px;
+}
+
+.modale__adding .fa-xmark {
+	cursor: pointer;
+	position: relative;
+	top: 20px;
+	left: 480px;
+	font-size: 18px;
+}
+
+.modale__adding h2 {
+	position: relative;
+	left: 130px;
+	top: 40px;
+	font-size: 26px;
+	font-weight: 400;
+	color: black;
+	font-family: 'Work Sans';
+}
+
+.button__validate {
+	cursor: pointer;
+	position: relative;
+	top: 410px;
+	left: 85px;
+	border-radius: 60px;
+	background-color: #a7a7a7;
+	color: white;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 94px;
+	padding-right: 94px;
+	font-weight: 700;
+	font-size: 14px;
+	width: 237px;
+}
+
+.picture__adding {
+	position: relative;
+	top: 75px;
+	margin-bottom: -190px;
+	width: 420px;
+	height: 169px;
+	background-color: #e8f1f6;
+	border-radius: 10px;
+}
+
+.picture__adding p {
+	font-size: 10px;
+	font-weight: 400;
+	position: relative;
+	top: 55px;
+	left: 160px;
+}
+
+.picture__adding input {
+	visibility: hidden;
+}
+
+.picture__adding label {
+	position: relative;
+	top: 60px;
+	left: 50px;
+	background-color: #cbd6dc;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 18px;
+	padding-right: 18px;
+	border-radius: 50px;
+}
+
+.fa-image {
+	position: relative;
+	top: 20px;
+	left: 175px;
+	font-size: 68px;
+	color: #b9c5cc;
+}
+
+.categorie--groupe {
+	position: relative;
+	top: 300px;
+	/*left: 50px;*/
+	margin-top: 20px;
+	display: flex;
+	flex-direction: column;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.categorie--groupe select {
+	margin-top: 10px;
+	height: 51px;
+	width: 420px;
+	/*font-size: 1.2em;*/
+	border: none;
+	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+	background-color: white;
+}
+
+.titre--groupe {
+	position: relative;
+	top: 300px;
+	margin-top: -20px;
+	/*left: 50px;*/
+	display: flex;
+	flex-direction: column;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.titre--groupe input {
+	margin-top: 10px;
+	height: 49px;
+	width: 416px;
+	/*font-size: 1.2em;*/
+	border: none;
+	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+}
+
+.border__decorative {
+	position: relative;
+	top: 360px;
+	border: 1px solid #b3b3b3;
 }
 
 h1{
@@ -168,13 +402,13 @@ li:hover {
 
 .edit--mode p {
 	position: relative;
-	left: 550px;
+	left: 750px;
 	bottom: 7px;
 }
 
 .edit--mode .fa-pen-to-square {
 	position: relative;
-	left: 520px;
+	left: 720px;
 	top: 5px;
 }
 
