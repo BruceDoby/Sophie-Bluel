@@ -382,8 +382,8 @@ function generateGallery(images) {
         const imageContainer = document.createElement('figure');
 
         const imgElement = document.createElement('img');
-        imgElement.src = image.url;
-        imgElement.alt = image.alt;
+        imgElement.src = image.imageUrl;
+        imgElement.alt = image.title;
         imageContainer.appendChild(imgElement);
 
         const trashIcon = document.createElement('i');
