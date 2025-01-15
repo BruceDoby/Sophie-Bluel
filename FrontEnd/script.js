@@ -371,12 +371,18 @@ function generateGallery(images) {
         const imgElement = document.createElement('img');
         imgElement.src = image.imageUrl;
         imgElement.alt = image.title;
+        imgElement.id = 'data-id'
         imageContainer.appendChild(imgElement);
 
         const trashIcon = document.createElement('i');
         trashIcon.className = 'fa-solid fa-trash-can';
         imageContainer.appendChild(trashIcon);
-        trashIcon.addEventListener('click', () => console.log('test'))
+        // trashIcon.addEventListener('click', (event) => handleTrashIconClick(event));
+        console.log(trashIcon); // Vérifie si trashIcon est bien sélectionné
+        trashIcon.addEventListener('click', (event) => {
+          console.log('Click détecté sur l\'icône de suppression');
+          handleTrashIconClick(event);
+        });
 
         galleryModale.appendChild(imageContainer);
     });
@@ -394,7 +400,7 @@ async function fetchAndPopulateCategories() {
       }
 
       // Conversion de la réponse en JSON
-      const works = await response.json(); // Supposons que l'API retourne une liste de travaux
+      const works = await response.json();
 
       // Extraction des catégories uniques
       const categories = Array.from(
@@ -477,245 +483,62 @@ document.addEventListener('DOMContentLoaded', fetchAndPopulateCategories);
   }
 });*/
 
+// Fonction pour gérer la suppression d'un travail
+async function handleTrashIconClick(event) {
+  // Vérifie si l'élément cliqué est une icône de suppression
+  console.log(event.target);
+  console.log('click')
+  // if (event.target.classList.contains('trashIcon')) {
+      const trashIcon = event.target;
+      console.log('trashIcon', trashIcon)
 
-/*const buttonValidate = document.querySelector('.button__validate');
-const titreInput = document.querySelector('.title');
-const categorieSelect = document.querySelector('#categorie');
-const pictureInput = document.querySelector('#add-photo');
-const pictureAdding = document.querySelector('.picture__adding');
-const gallery = document.querySelector('.gallery');
-const modaleGallery = document.querySelector('.galery__modale');
-const crossMadding = document.querySelector('#cross--madding');
-const errorMessage = document.createElement('p');
-errorMessage.classList.add('error-message');
-buttonValidate.insertAdjacentElement('beforebegin', errorMessage);
+      // Trouve l'élément parent contenant les informations du travail (son id)
+      const workElement = trashIcon.closest('#data-id');
+      console.log('workElement', workElement)
 
-// Fonction pour changer la couleur du bouton
-function updateButtonState() {
-    if (titreInput.value && categorieSelect.value && pictureInput.files.length > 0) {
-        buttonValidate.style.backgroundColor = '#1D6154';
-    } else {
-        buttonValidate.style.backgroundColor = '';
-    }
+      if (!workElement) {
+          console.error("Impossible de trouver l'élément contenant le travail à supprimer.");
+          return;
+      }
+
+      // Récupère l'ID du travail à partir de l'attribut data-id
+      const workId = workElement.dataset.id;
+
+      try {
+          // Envoie une requête DELETE à l'API pour supprimer le travail
+          console.log(token);
+          const response = await fetch(`${apiUrl}/works/${workId}`, {
+              method: 'DELETE',
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+
+          console.log(response);
+          if (!response.ok) {
+              console.error("Erreur lors de la suppression du travail :", response.statusText);
+              return;
+          }
+
+          // Supprime le travail de la galerie de la modale
+          workElement.remove();
+
+          // Supprime également le travail de la galerie de la page d'accueil
+          const homepageWorkElement = document.querySelector(`[data-id="${workId}"]`);
+          if (homepageWorkElement) {
+              homepageWorkElement.remove();
+          }
+
+          console.log(`Travail avec l'ID ${workId} supprimé avec succès.`);
+      } catch (error) {
+          console.error("Erreur lors de la suppression :", error);
+      }
+  // }
 }
 
-// Fonction pour afficher l'image dans .picture__adding
-pictureInput.addEventListener('change', function () {
-    const file = pictureInput.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
-        };
-        reader.readAsDataURL(file);
-    }
-    updateButtonState();
-});
+document.addEventListener('click', handleTrashIconClick);
 
-// Fonction pour envoyer les données à l'API
-buttonValidate.addEventListener('click', function () {
-    const titre = titreInput.value;
-    const categorie = categorieSelect.value;
-    const image = pictureInput.files[0];
 
-    // Vérification si tout est rempli
-    if (!titre || !categorie || !image) {
-        errorMessage.textContent = 'Veuillez remplir tous les champs et ajouter une image.';
-        errorMessage.style.color = 'red';
-        return;
-    }
-
-    // Création de l'objet FormData
-    const formData = new FormData();
-    formData.append('titre', titre);
-    formData.append('categorie', categorie);
-    formData.append('image', image);
-
-    // Envoi des données à l'API
-    fetch(apiUrl, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Ajout dynamique de l'image dans la galerie de la page d'accueil
-        const newProject = document.createElement('figure');
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(image);
-        const caption = document.createElement('figcaption');
-        caption.textContent = titre;
-        newProject.appendChild(img);
-        newProject.appendChild(caption);
-        gallery.appendChild(newProject);
-
-        newProject.setAttribute('data-id', data.id);
-
-        // Ajout dynamique de l'image dans la galerie modale (sans texte)
-        const modaleProject = document.createElement('figure');
-        const modaleImg = document.createElement('img');
-        modaleImg.src = URL.createObjectURL(image);
-        modaleProject.appendChild(modaleImg);
-        modaleGallery.appendChild(modaleProject);
-
-        // Réinitialisation du formulaire
-        titreInput.value = '';
-        pictureInput.value = '';
-        pictureAdding.innerHTML = '<i class="fa-regular fa-image"></i><label for="add-photo">+ Ajouter une photo</label><input type="file" name="add-photo" id="add-photo"><p>jpg, png : 4mo max</p>';
-        buttonValidate.style.backgroundColor = '';
-        errorMessage.textContent = '';
-    })
-    .catch(error => {
-        console.error('Erreur lors de l\'envoi du projet:', error);
-    });
-});
-
-// Mise à jour de l'état du bouton à chaque modification
-titreInput.addEventListener('input', updateButtonState);
-categorieSelect.addEventListener('change', updateButtonState);
-pictureInput.addEventListener('change', updateButtonState);*/
-
-/*const buttonValidate = document.querySelector('.button__validate');
-const titreInput = document.querySelector('.title');
-const categorieSelect = document.querySelector('#categorie');
-const pictureInput = document.querySelector('#add-photo');
-const pictureAdding = document.querySelector('.picture__adding');
-const gallery = document.querySelector('.gallery');
-const modaleGallery = document.querySelector('.galery__modale');
-const crossMadding = document.querySelector('#cross--madding');
-const errorMessage = document.createElement('p');
-errorMessage.classList.add('error-message');
-buttonValidate.insertAdjacentElement('beforebegin', errorMessage);
-
-// Fonction pour changer la couleur du bouton
-function updateButtonState() {
-    if (titreInput.value && categorieSelect.value && pictureInput.files.length > 0) {
-        buttonValidate.style.backgroundColor = '#1D6154';
-    } else {
-        buttonValidate.style.backgroundColor = '';
-    }
-}
-
-// Fonction pour afficher l'image dans .picture__adding
-pictureInput.addEventListener('change', function () {
-    const file = pictureInput.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
-        };
-        reader.readAsDataURL(file);
-    }
-    updateButtonState();
-});
-
-// Fonction pour envoyer les données avec le token
-async function envoyerDonneesAvecToken(data) {
-  const authToken = localStorage.getItem("authToken");
-  if (!authToken) {
-    console.error("Token non trouvé. Veuillez vous connecter.");
-    return;
-  }
-
-  console.log('Ici', data)
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      },
-      body: JSON.stringify(data)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erreur HTTP : ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log('Données envoyées avec succès :', result);
-    return result;
-  } catch (error) {
-    console.error('Erreur lors de l\'envoi des données :', error);
-  }
-}
-
-function readFileAsBinary(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const binaryString = reader.result.split(',')[1];
-      resolve(binaryString);
-    };
-
-    reader.onerror = () => reject(new Error('Erreur lors de la lecture du fichier.'));
-    reader.readAsDataURL(file);
-  });
-}
-
-// Fonction pour gérer l'envoi du formulaire
-buttonValidate.addEventListener('click', async function () {
-    const titre = titreInput.value;
-    const categorie = categorieSelect.value;
-    const image = pictureInput.files[0];
-
-    // Vérification si tout est rempli
-    if (!titre || !categorie || !image) {
-        errorMessage.textContent = 'Veuillez remplir tous les champs et ajouter une image.';
-        errorMessage.style.color = 'red';
-        return;
-    }
-
-    // Création de l'objet FormData
-    const formData = new FormData();
-    formData.append('titre', titre);
-    formData.append('categorie', categorie);
-    formData.append('image', image);
-
-    // Préparation des données à envoyer
-    const data = {
-        titre: titre,
-        categorie: categorie,
-        image: image
-    };
-
-    // Envoi des données à l'API avec le token
-    const result = await envoyerDonneesAvecToken(data);
-    if (!result) {
-        return;
-    }
-
-    // Ajout dynamique de l'image dans la galerie de la page d'accueil
-    /*const newProject = document.createElement('figure');
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(image);
-    const caption = document.createElement('figcaption');
-    caption.textContent = titre;
-    newProject.appendChild(img);
-    newProject.appendChild(caption);
-    gallery.appendChild(newProject);*/
-
-    /*newProject.setAttribute('data-id', result.id);*/
-
-    // Ajout dynamique de l'image dans la galerie modale
-    /*const modaleProject = document.createElement('figure');
-    const modaleImg = document.createElement('img');
-    modaleImg.src = URL.createObjectURL(image);
-    modaleProject.appendChild(modaleImg);
-    modaleGallery.appendChild(modaleProject);
-
-    // Réinitialisation du formulaire
-    titreInput.value = '';
-    pictureInput.value = '';
-    pictureAdding.innerHTML = '<i class="fa-regular fa-image"></i><label for="add-photo">+ Ajouter une photo</label><input type="file" name="add-photo" id="add-photo"><p>jpg, png : 4mo max</p>';
-    buttonValidate.style.backgroundColor = '';
-    errorMessage.textContent = '';
-});
-
-// Mise à jour de l'état du bouton à chaque modification
-titreInput.addEventListener('input', updateButtonState);
-// categorieSelect.addEventListener('change', updateButtonState);
-pictureInput.addEventListener('change', updateButtonState);*/
 
 const buttonValidate = document.querySelector('.button__validate');
 const titreInput = document.querySelector('.title');
@@ -773,10 +596,9 @@ async function envoyerDonneesAvecToken(data) {
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${authToken}`
       },
-      body: JSON.stringify(data)
+      body: data
     });
 
     if (!response.ok) {
@@ -820,24 +642,14 @@ buttonValidate.addEventListener('click', async function () {
 
     // Création de l'objet FormData
     const formData = new FormData();
-    formData.append('titre', titre);
-    formData.append('categorie', categorie);
+    formData.append('title', titre);
+    formData.append('category', categorie);
     formData.append('image', image);
         
 
-    try {
-      // Convertir l'image en base64
-      const imageBase64 = await readFileAsBase64(image);
-  
-      // Préparer les données
-      const data = {
-        titre: titre,
-        categorie: categorie,
-        image: imageBase64,
-      };
-  
+    try {  
       // Envoyer les données
-      const result = await envoyerDonneesAvecToken(data);
+      const result = await envoyerDonneesAvecToken(formData);
       if (result) {
         console.log('Envoi réussi, mise à jour de l\'UI...');
         // Mettez à jour l'interface utilisateur ici
@@ -846,30 +658,9 @@ buttonValidate.addEventListener('click', async function () {
       console.error('Erreur lors du traitement de l\'image ou de l\'envoi des données :', error);
     }
 
-    // Envoi des données à l'API avec le token
-    const result = await envoyerDonneesAvecToken(data);
     if (!result) {
         return;
     }
-
-    // Ajout dynamique de l'image dans la galerie de la page d'accueil
-    /*const newProject = document.createElement('figure');
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(image);
-    const caption = document.createElement('figcaption');
-    caption.textContent = titre;
-    newProject.appendChild(img);
-    newProject.appendChild(caption);
-    gallery.appendChild(newProject);*/
-
-    /*newProject.setAttribute('data-id', result.id);*/
-
-    // Ajout dynamique de l'image dans la galerie modale
-    /*const modaleProject = document.createElement('figure');
-    const modaleImg = document.createElement('img');
-    modaleImg.src = URL.createObjectURL(image);
-    modaleProject.appendChild(modaleImg);
-    modaleGallery.appendChild(modaleProject);*/
 
     // Réinitialisation du formulaire
     titreInput.value = '';
