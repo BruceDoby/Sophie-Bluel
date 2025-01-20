@@ -36,6 +36,9 @@ function afficherWorks(works) {
   works.forEach((work) => {
     const figure = document.createElement('figure');
 
+    // Ajouter l'attribut data-id avec l'ID du travail
+    figure.setAttribute('data-id', work.id);
+
     // Ici les images sont créés, l'appendChild permet de relier l'élément à l'élément figure juste au dessus, image.src et image.alt 
     // permettent de récupérer la source et l'alt de chaque image et work.imageUrl est l'URL depuis l'API de l'image tandis que work.title
     // est le titre de l'élément pour l'alt
@@ -368,14 +371,17 @@ function generateGallery(images) {
     images.forEach(image => {
         const imageContainer = document.createElement('figure');
 
+        // Ajouter l'attribut data-id avec l'ID de l'image
+        imageContainer.setAttribute('data-id', image.id);
+
         const imgElement = document.createElement('img');
         imgElement.src = image.imageUrl;
         imgElement.alt = image.title;
-        imgElement.id = 'data-id'
         imageContainer.appendChild(imgElement);
 
         const trashIcon = document.createElement('i');
         trashIcon.className = 'fa-solid fa-trash-can';
+        trashIcon.setAttribute('data-id', image.id);
         imageContainer.appendChild(trashIcon);
         // trashIcon.addEventListener('click', (event) => handleTrashIconClick(event));
         console.log(trashIcon); // Vérifie si trashIcon est bien sélectionné
@@ -490,10 +496,11 @@ async function handleTrashIconClick(event) {
   console.log('click')
   // if (event.target.classList.contains('trashIcon')) {
       const trashIcon = event.target;
+      const workId = trashIcon.getAttribute('data-id');
       console.log('trashIcon', trashIcon)
 
       // Trouve l'élément parent contenant les informations du travail (son id)
-      const workElement = trashIcon.closest('#data-id');
+      const workElement = trashIcon.closest('[data-id]');
       console.log('workElement', workElement)
 
       if (!workElement) {
@@ -501,16 +508,20 @@ async function handleTrashIconClick(event) {
           return;
       }
 
-      // Récupère l'ID du travail à partir de l'attribut data-id
-      const workId = workElement.dataset.id;
+      const authToken = localStorage.getItem('authToken');
+  
+      if (!authToken) {
+        console.error("Token non trouvé.");
+        return;
+      }
 
       try {
           // Envoie une requête DELETE à l'API pour supprimer le travail
-          console.log(token);
+          console.log(authToken);
           const response = await fetch(`${apiUrl}/works/${workId}`, {
               method: 'DELETE',
               headers: {
-                  'Authorization': `Bearer ${token}`
+                  'Authorization': `Bearer ${authToken}`
               }
           });
 
@@ -533,10 +544,12 @@ async function handleTrashIconClick(event) {
       } catch (error) {
           console.error("Erreur lors de la suppression :", error);
       }
-  // }
+  //}
 }
 
 document.addEventListener('click', handleTrashIconClick);
+
+fetchWorks();
 
 
 
