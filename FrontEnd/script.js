@@ -496,7 +496,7 @@ async function handleTrashIconClick(event) {
   console.log('click')
   // if (event.target.classList.contains('trashIcon')) {
       const trashIcon = event.target;
-      const workId = trashIcon.getAttribute('data-id');
+      /*const workId = trashIcon.getAttribute('data-id');*/
       console.log('trashIcon', trashIcon)
 
       // Trouve l'élément parent contenant les informations du travail (son id)
@@ -507,6 +507,8 @@ async function handleTrashIconClick(event) {
           console.error("Impossible de trouver l'élément contenant le travail à supprimer.");
           return;
       }
+
+      const workId = workElement.dataset.id;
 
       const authToken = localStorage.getItem('authToken');
   
