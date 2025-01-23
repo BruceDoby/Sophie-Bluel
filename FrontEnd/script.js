@@ -66,6 +66,7 @@ async function chargerGalerie() {
   const works = await fetchWorks();
   if (works.length > 0) {
     afficherWorks(works);
+    generateGallery(works);
   } else {
     console.warn("Aucun travail n'a été récupéré depuis l'API.");
   }
@@ -313,7 +314,7 @@ function hideModale(modaleToHide) {
 // qui ne les traite pas immédiatement, la const images et la fonction generateGallery (qui est élaboré unpeu plus bas) sert également
 // à faire en sorte que les données soit traités directement, en effet la const converti les données JSON en object javascript pour
 // les transmettre à la fonction
-async function fetchImages() {
+/*async function fetchImages() {
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -324,7 +325,7 @@ async function fetchImages() {
     } catch (error) {
         console.error('Erreur lors de la récupération des travaux :', error);
     }
-}
+}*/
 
 // Ici les 6 event listener servent à écouter le clic sur différents élément pour effectuer une action en fonction de l'élément qui est
 // cliqué, la première affiche la modale et les images, la 2e fais disparaitre la modale de base pour faire apparaitre la modale d'ajout
@@ -332,7 +333,7 @@ async function fetchImages() {
 // l'overlay
 modifierButton.addEventListener('click', () => {
     showModale(modale);
-    fetchImages(); 
+    // fetchImages(); 
 });
 
 ajouterPhotoButton.addEventListener('click', () => {
@@ -439,56 +440,6 @@ async function fetchAndPopulateCategories() {
 // Appel de la fonction pour remplir le <select> au chargement de la page
 document.addEventListener('DOMContentLoaded', fetchAndPopulateCategories);
 
-
-// Ici l'event listener va permettre de détecter le clic pour que le reste du code s'execute
-/*document.addEventListener('click', async (event) => {
-  // Ici on vérifie si l'élément cliqué est une icône de suppression
-  console.log('click')
-  if (event.target.classList.contains('trashIcon')) {
-      const trashIcon = event.target;
-
-      // La const workElement servira à trouver l'élément parent contenant les informations du travail (son id)
-      const workElement = trashIcon.closest('[data-id]');
-
-      if (!workElement) {
-          console.error("Impossible de trouver l'élément contenant le travail à supprimer.");
-          return;
-      }
-
-      // La const workId récupère l'ID du travail à partir de l'attribut data-id
-      const workId = workElement.dataset.id;
-
-      try {
-          // Une requête DELETE est envoyé à l'API pour supprimer le travail en question, j'ai remis le même apiUrl, pas sûr si c'est bien
-          // ça cependant
-          const response = await fetch(`${apiUrl}/works/${workId}`, {
-              method: 'DELETE',
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-
-          if (!response.ok) {
-              console.error("Erreur lors de la suppression du travail :", response.statusText);
-              return;
-          }
-
-          // Permet la suppression du travail de la galerie de la modale
-          workElement.remove();
-
-          // Et en même temps ici on supprime également le travail de la galerie de la page d'accueil, comme demandé
-          const homepageWorkElement = document.querySelector(`[data-id="${workId}"]`);
-          if (homepageWorkElement) {
-              homepageWorkElement.remove();
-          }
-
-          console.log(`Travail avec l'ID ${workId} supprimé avec succès.`);
-      } catch (error) {
-          console.error("Erreur lors de la suppression :", error);
-      }
-  }
-});*/
-
 // Fonction pour gérer la suppression d'un travail
 async function handleTrashIconClick(event) {
   // Vérifie si l'élément cliqué est une icône de suppression
@@ -520,7 +471,7 @@ async function handleTrashIconClick(event) {
       try {
           // Envoie une requête DELETE à l'API pour supprimer le travail
           console.log(authToken);
-          const response = await fetch(`${apiUrl}/works/${workId}`, {
+          const response = await fetch(`${apiUrl}/${workId}`, {
               method: 'DELETE',
               headers: {
                   'Authorization': `Bearer ${authToken}`
@@ -552,7 +503,6 @@ async function handleTrashIconClick(event) {
 document.addEventListener('click', handleTrashIconClick);
 
 fetchWorks();
-
 
 
 const buttonValidate = document.querySelector('.button__validate');
@@ -589,14 +539,14 @@ pictureInput.addEventListener('change', function () {
     updateButtonState();
 });
 
-function readFileAsBase64(file) {
+/*function readFileAsBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result.split(',')[1]); // Supprime le préfixe "data:image/png;base64,"
     reader.onerror = () => reject(new Error('Erreur lors de la lecture du fichier.'));
     reader.readAsDataURL(file);
   });
-}
+}*/
 
 // Fonction pour envoyer les données avec le token
 async function envoyerDonneesAvecToken(data) {
@@ -642,8 +592,35 @@ function readFileAsBinary(file) {
   });
 }
 
+
+
+/* async function fetchWorks() {
+  try {
+      const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+      });
+
+      if (!response.ok) {
+          throw new Error(`Erreur lors de la récupération des données : ${response.status}`);
+      }
+
+      const works = await response.json();
+
+      generateGallery(works);
+      afficherWorks(works);
+  } catch (error) {
+      console.error('Erreur lors de la mise à jour de la galerie :', error);
+  }
+}*/
+
 // Fonction pour gérer l'envoi du formulaire
 buttonValidate.addEventListener('click', async function () {
+  console.log('Référence actuelle de pictureInput :', pictureInput);
+  console.log('Fichier sélectionné :', pictureInput.files[0]);
+
     const titre = titreInput.value;
     const categorie = categorieSelect.value;
     const image = pictureInput.files[0];
@@ -667,15 +644,16 @@ buttonValidate.addEventListener('click', async function () {
       const result = await envoyerDonneesAvecToken(formData);
       if (result) {
         console.log('Envoi réussi, mise à jour de l\'UI...');
-        // Mettez à jour l'interface utilisateur ici
+        // await fetchWorks();
+        await chargerGalerie();
       }
     } catch (error) {
       console.error('Erreur lors du traitement de l\'image ou de l\'envoi des données :', error);
     }
 
-    if (!result) {
+    /*if (!result) {
         return;
-    }
+    }*/
 
     // Réinitialisation du formulaire
     titreInput.value = '';
@@ -683,9 +661,23 @@ buttonValidate.addEventListener('click', async function () {
     pictureAdding.innerHTML = '<i class="fa-regular fa-image"></i><label for="add-photo">+ Ajouter une photo</label><input type="file" name="add-photo" id="add-photo"><p>jpg, png : 4mo max</p>';
     buttonValidate.style.backgroundColor = '';
     errorMessage.textContent = '';
+
+    newPictureInput = document.querySelector('#add-photo');
+
+    newPictureInput.addEventListener('change', function () {
+      const file = newPictureInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
+        };
+        reader.readAsDataURL(file);
+    }
+    updateButtonState();
+  });
 });
 
 // Mise à jour de l'état du bouton à chaque modification
 titreInput.addEventListener('input', updateButtonState);
-/*categorieSelect.addEventListener('change', updateButtonState);*/
+// categorieSelect.addEventListener('change', updateButtonState);
 pictureInput.addEventListener('change', updateButtonState);
