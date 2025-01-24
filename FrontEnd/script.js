@@ -566,6 +566,10 @@ async function envoyerDonneesAvecToken(data) {
       body: data
     });
 
+    if (response.ok) {
+    console.log('Requête POST réussie, bouton réactivé');
+    }
+
     if (!response.ok) {
       throw new Error(`Erreur HTTP : ${response.status}`);
     }
@@ -672,9 +676,9 @@ buttonValidate.addEventListener('click', async function () {
             pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
         };
         reader.readAsDataURL(file);
-    }
-    updateButtonState();
-  });
+      }
+      updateButtonState();
+    });
 });
 
 // Mise à jour de l'état du bouton à chaque modification
