@@ -663,10 +663,11 @@ buttonValidate.addEventListener('click', async function () {
     titreInput.value = '';
     pictureInput.value = '';
     pictureAdding.innerHTML = '<i class="fa-regular fa-image"></i><label for="add-photo">+ Ajouter une photo</label><input type="file" name="add-photo" id="add-photo"><p>jpg, png : 4mo max</p>';
+    const newPictureInput = document.querySelector('#add-photo');
     buttonValidate.style.backgroundColor = '';
     errorMessage.textContent = '';
 
-    newPictureInput = document.querySelector('#add-photo');
+    // newPictureInput = document.querySelector('#add-photo');
 
     newPictureInput.addEventListener('change', function () {
       const file = newPictureInput.files[0];
@@ -685,3 +686,224 @@ buttonValidate.addEventListener('click', async function () {
 titreInput.addEventListener('input', updateButtonState);
 // categorieSelect.addEventListener('change', updateButtonState);
 pictureInput.addEventListener('change', updateButtonState);
+
+
+/*buttonValidate.addEventListener('click', async function () {
+  console.log('Référence actuelle de pictureInput :', pictureInput);
+  console.log('Fichier sélectionné :', pictureInput.files[0]);
+
+  const titre = titreInput.value;
+  const categorie = categorieSelect.value;
+  const image = pictureInput.files[0];
+
+  // Vérification si tout est rempli
+  if (!titre || !categorie || !image) {
+    errorMessage.textContent = 'Veuillez remplir tous les champs et ajouter une image.';
+    errorMessage.style.color = 'red';
+    return;
+  }
+
+  // Création de l'objet FormData
+  const formData = new FormData();
+  formData.append('title', titre);
+  formData.append('category', categorie);
+  formData.append('image', image);
+
+  try {
+    // Envoyer les données
+    const result = await envoyerDonneesAvecToken(formData);
+    if (result) {
+      console.log('Envoi réussi, mise à jour de l\'UI...');
+      await chargerGalerie();
+    }
+  } catch (error) {
+    console.error('Erreur lors du traitement de l\'image ou de l\'envoi des données :', error);
+  }
+
+  // Réinitialisation du formulaire
+  titreInput.value = '';
+  pictureInput.value = '';
+  pictureAdding.innerHTML = `
+    <i class="fa-regular fa-image"></i>
+    <label for="add-photo">+ Ajouter une photo</label>
+    <input type="file" name="add-photo" id="add-photo">
+    <p>jpg, png : 4mo max</p>
+  `;
+  buttonValidate.style.backgroundColor = '';
+  errorMessage.textContent = '';
+
+  // Récupérer le nouvel input et réassigner les listeners
+  const newPictureInput = document.querySelector('#add-photo');
+  newPictureInput.addEventListener('change', function () {
+    const file = newPictureInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
+      };
+      reader.readAsDataURL(file);
+    }
+    updateButtonState();
+  });
+
+  // Réattacher les listeners pour updateButtonState
+  titreInput.addEventListener('input', updateButtonState);
+  categorieSelect.addEventListener('change', updateButtonState);
+  newPictureInput.addEventListener('change', updateButtonState);
+});*/
+
+// Attache un écouteur sur un parent stable pour les clics
+/*document.addEventListener('click', async function (event) {
+  // Vérifie si l'élément cliqué est le bouton de validation
+  if (event.target === buttonValidate) {
+    console.log('Référence actuelle de pictureInput :', pictureInput);
+    console.log('Fichier sélectionné :', pictureInput.files[0]);
+
+    const titre = titreInput.value;
+    const categorie = categorieSelect.value;
+    const image = pictureInput.files[0];
+
+    // Vérification si tout est rempli
+    if (!titre || !categorie || !image) {
+      errorMessage.textContent = 'Veuillez remplir tous les champs et ajouter une image.';
+      errorMessage.style.color = 'red';
+      return;
+    }
+
+    // Création de l'objet FormData
+    const formData = new FormData();
+    formData.append('title', titre);
+    formData.append('category', categorie);
+    formData.append('image', image);
+
+    try {
+      // Envoyer les données
+      const result = await envoyerDonneesAvecToken(formData);
+      if (result) {
+        console.log('Envoi réussi, mise à jour de l\'UI...');
+        await chargerGalerie();
+      }
+    } catch (error) {
+      console.error('Erreur lors du traitement de l\'image ou de l\'envoi des données :', error);
+    }
+
+    // Réinitialisation du formulaire
+    titreInput.value = '';
+    pictureInput.value = '';
+    pictureAdding.innerHTML = `
+      <i class="fa-regular fa-image"></i>
+      <label for="add-photo">+ Ajouter une photo</label>
+      <input type="file" name="add-photo" id="add-photo">
+      <p>jpg, png : 4mo max</p>
+    `;
+    buttonValidate.style.backgroundColor = '';
+    errorMessage.textContent = '';
+
+    // Récupérer la nouvelle référence de pictureInput après la modification du DOM
+    const newPictureInput = document.querySelector('#add-photo');
+
+    // Réattacher l'event listener pour le changement de photo
+    newPictureInput.addEventListener('change', function () {
+      const file = newPictureInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
+        };
+        reader.readAsDataURL(file);
+      }
+      updateButtonState();
+    });
+
+    // Réattacher le listener pour updateButtonState
+    titreInput.addEventListener('input', updateButtonState);
+    categorieSelect.addEventListener('change', updateButtonState);
+    newPictureInput.addEventListener('change', updateButtonState);
+  }
+});
+
+// Attache un écouteur sur un parent stable pour les changements sur l'input file
+document.addEventListener('change', function (event) {
+  // Vérifie si l'élément changé est l'input file
+  if (event.target && event.target.id === 'add-photo') {
+    const newPictureInput = event.target;
+    const file = newPictureInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
+      };
+      reader.readAsDataURL(file);
+    }
+    updateButtonState();
+  }
+});
+
+// Attache des écouteurs sur les champs de saisie pour mettre à jour l'état du bouton
+document.addEventListener('input', function (event) {
+  if (event.target === titreInput || event.target === categorieSelect || event.target === pictureInput) {
+    updateButtonState();
+  }
+});*/
+
+/*buttonValidate.addEventListener('click', async function () {
+  console.log('Référence actuelle de pictureInput :', pictureInput);
+  console.log('Fichier sélectionné :', pictureInput.files[0]);
+
+  const titre = titreInput.value;
+  const categorie = categorieSelect.value;
+  const image = pictureInput.files[0];
+
+  // Vérification si tout est rempli
+  if (!titre || !categorie || !image) {
+    errorMessage.textContent = 'Veuillez remplir tous les champs et ajouter une image.';
+    errorMessage.style.color = 'red';
+    return;
+  }
+
+  // Création de l'objet FormData
+  const formData = new FormData();
+  formData.append('title', titre);
+  formData.append('category', categorie);
+  formData.append('image', image);
+
+  try {
+    // Envoyer les données
+    const result = await envoyerDonneesAvecToken(formData);
+    if (result) {
+      console.log('Envoi réussi, mise à jour de l\'UI...');
+      await chargerGalerie();
+    }
+  } catch (error) {
+    console.error('Erreur lors du traitement de l\'image ou de l\'envoi des données :', error);
+  }
+
+  // Réinitialisation du formulaire
+  titreInput.value = '';
+  pictureInput.value = '';
+
+  // Modification du contenu sans recréer l'élément
+  pictureAdding.innerHTML = '<i class="fa-regular fa-image"></i><label for="add-photo">+ Ajouter une photo</label><input type="file" name="add-photo" id="add-photo"><p>jpg, png : 4mo max</p>';
+
+  // Attacher un événement à l'input file (sans recréer l'élément)
+  const newPictureInput = document.querySelector('#add-photo');
+  newPictureInput.addEventListener('change', function () {
+    const file = newPictureInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
+      };
+      reader.readAsDataURL(file);
+    }
+    updateButtonState();
+  });
+
+  buttonValidate.style.backgroundColor = '';
+  errorMessage.textContent = '';
+});
+
+// Mise à jour de l'état du bouton à chaque modification
+titreInput.addEventListener('input', updateButtonState);
+// categorieSelect.addEventListener('change', updateButtonState);
+pictureInput.addEventListener('change', updateButtonState);*/
