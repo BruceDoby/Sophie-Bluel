@@ -663,11 +663,16 @@ buttonValidate.addEventListener('click', async function () {
     titreInput.value = '';
     pictureInput.value = '';
     pictureAdding.innerHTML = '<i class="fa-regular fa-image"></i><label for="add-photo">+ Ajouter une photo</label><input type="file" name="add-photo" id="add-photo"><p>jpg, png : 4mo max</p>';
-    const newPictureInput = document.querySelector('#add-photo');
+    // const newPictureInput = document.querySelector('#add-photo');
     buttonValidate.style.backgroundColor = '';
     errorMessage.textContent = '';
 
-    // newPictureInput = document.querySelector('#add-photo');
+    const newPictureInput = document.querySelector('#add-photo');
+
+    if (!newPictureInput) {
+      console.error("L'élément #add-photo n'a pas été trouvé !");
+      return;
+    }
 
     newPictureInput.addEventListener('change', function () {
       const file = newPictureInput.files[0];
@@ -680,6 +685,8 @@ buttonValidate.addEventListener('click', async function () {
       }
       updateButtonState();
     });
+
+  updateButtonState();
 });
 
 // Mise à jour de l'état du bouton à chaque modification
