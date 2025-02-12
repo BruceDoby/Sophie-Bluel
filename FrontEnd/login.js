@@ -1,3 +1,5 @@
+/****************MISE EN PLACE DE LA CONNEXION UTILISATEUR*****************/
+
 // Attente du DOM pour executer le code, récupération via nodelist des balises form email et password
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.querySelector("form");
@@ -60,6 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
             displayErrorMessage("Une erreur est survenue. Veuillez réessayer.");
         }
     });
+
+    /***************CREATION DE L'ELEMENT QU'EST LE MESSAGE D'ERREUR*****************/
 
     // Ici la fonction permet d'afficher un message d'erreur (les messages vu au dessus), la let errorMessage stocke l'élément sélectionné
     // par la nodelist (ici .error-message, créé juste en dessous), le if du dessous va permettre de vérifier si aucun élément avec la class

@@ -1,6 +1,8 @@
 // Récupération de l'API, la const apiUrl est créé pour facilité la potentielle réutilisabilité de l'url de l'API
 const apiUrl = 'http://localhost:5678/api/works';
 
+/*****************GENERATION DES TRAVAUX******************/
+
 // Récupération des works du backend depuis l'API, la fonction asynchrone permet d'attendre que les récupérations nécessaire soit faites
 // avant d'executer le reste, fetchWorks permet d'englober le fetch et de facilité également sa potentielle réutilisabilité
 // fetch permet ensuite d'envoyer la requête à l'API pour récupérer des données, await complète la fonction asynchrone car c'est ce qui
@@ -9,6 +11,7 @@ const apiUrl = 'http://localhost:5678/api/works';
 // et affiche un message d'erreur puis attend le temps que la response soit valide, catch permet d'intercepter les possibles erreurs,
 // de générer un message d'erreur dans la console et empêcher le programme planter avec return[] en remplaçant le résultat attendu par
 // un tableau sans éléments indiquant qu'aucune données n'est disponible à cause de l'erreur en question
+// QUAND JEXPLIQUERAI COMMENT MARCHE CE GENRE DE FONCTION BIEN EXPLIQUER EN DETAIL Y COMPRIS LE FONCTIONNEMENT DES ERREURS
 async function fetchWorks() {
   try {
     const response = await fetch(apiUrl);
@@ -37,7 +40,7 @@ function afficherWorks(works) {
     const figure = document.createElement('figure');
 
     // Ajouter l'attribut data-id avec l'ID du travail
-    figure.setAttribute('data-id', work.id);
+    figure.setAttribute('data-id', `page-${work.id}`);
 
     // Ici les images sont créés, l'appendChild permet de relier l'élément à l'élément figure juste au dessus, image.src et image.alt 
     // permettent de récupérer la source et l'alt de chaque image et work.imageUrl est l'URL depuis l'API de l'image tandis que work.title
@@ -60,7 +63,8 @@ function afficherWorks(works) {
 }
 
 // Ici l'on a encore une fonction asynchrone qui va permettre de charger la galerie, la condition if vérifie que works contient au moins
-// 1 éléments avec works.length > 0, dans ce cas afficherWorks affiche les données vu dans la fonction juste au dessus, sinon, else affiche
+// 1 éléments avec works.length > 0, dans ce cas afficherWorks affiche les données vu dans la fonction juste au dessus et generateGallery
+// charge les travaux (donc même chose) mais dans la modale, sinon, else affiche
 // un avertissement avec console.warn comportant le message entre parenthèses pour expliquer le problème
 async function chargerGalerie() {
   const works = await fetchWorks();
@@ -71,6 +75,8 @@ async function chargerGalerie() {
     console.warn("Aucun travail n'a été récupéré depuis l'API.");
   }
 }
+
+/***********CREATION DES FILTRES*************/
 
 // Ici la fonction genererFiltres, comme son nom l'indique, va générer les boutons des filtres, c'est une fonction asynchrone comme les autres
 // au dessus, on a également une nodelist qui sélectionne la div ayant la classe .filters et fetchCategories récupère la liste des catégories
@@ -99,9 +105,7 @@ async function genererFiltres() {
     button.textContent = category.name;
     button.dataset.categoryId = category.id;
 
-    // Ici button.classList.add permets d'ajouter les propriétés de base présent dans le css à chaque bouton avec filter__border ainsi que
-    // leur taille spécifique à chacun avec buttonsWidth, || 'border__one' est utilisé comme valeur de taille par défaut dans le cas où
-    // un bouton n'aurait pas de taille spécifique, je l'ai mis car ça m'a été conseillé mais je ne sais pas vraiment si c'est si utile
+    // Ici button.classList.add permets d'ajouter les propriétés de base présent dans le css à chaque bouton avec filter__border
     button.classList.add('filter__border', /*buttonsWidth[category.name] || 'border__one'*/);
 
     // Ici c'est le style des boutons de bases, qui ne sont pas cochés, ces propriétés ont le même effet que leur équivalent du même nom
@@ -112,6 +116,8 @@ async function genererFiltres() {
     button.style.fontWeight = '700'
 
     button.addEventListener('click', () => gererClicFiltre(button, category.id));
+
+    /************APPLICATION DES CHANGEMENTS ET MISE EN MARCHE DES FILTRES*************/
 
     // Ici button et categoryID se trouve () dans la fonction car ils sont passé à la fonction pour qu'elle puisse modifier le bouton
     // spécifiquement dans la fonction, donc le modifier spécifiquement lorsque l'on interragit avec permet à la fonction de le modifier
@@ -158,6 +164,8 @@ async function genererFiltres() {
   }
 }
 
+/***************RECUPERATION DES INFOS DES FILTRES DEPUIS L'API******************/
+
 // Ici cette fonction permets de récupérer les infos des catégories depuis l'API, comme expliquer précédemment try, catch permettent d'intercepter
 // les potentielles erreurs et la const response envoi la requête à l'API pour récupérer les données, la condition if en dessous signifie
 // concrètement que si la response n'est pas "ok" alors une erreur incluant le statut http est donnée grâce à throw qui permets de définir
@@ -202,6 +210,8 @@ async function fetchCategories() {
   }
 }
 
+/****************APPLIQUER LES FILTRES***************** */
+
 // Cette fonction sert à appliquer le filtre des catégories en fonction de quel catégorie a été choisi, pour ça, categoryId est utilisé 
 // pour représenter l'ID de la catégorie sélectionnée pour appliquer le filtre, la ligne du dessous, comme vu précédemment récupère les
 // données de l'API
@@ -227,6 +237,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await chargerGalerie();
 });
 
+/*************OPERATION DES CHANGEMENTS UNE FOIS CONNECTE**************/
+
 document.addEventListener("DOMContentLoaded", () => {
   // Ici  les éléments à afficher ou masquer sont sélectionnés
   const editMode = document.querySelector(".edit--mode");
@@ -237,12 +249,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const headerH1 = document.querySelector("header h1");
   const logIn = document.querySelector(".log-in");
 
+  // 1ER STOCKAGE DU TOKEN DANS CE FICHIER SCRIPT
   // Cette const permet de vérifier que le token est bien stocké pour pouvoir le réutiliser pour que les changements soit effectuer en 
   // fonction de si l'on est connecté ou non
   const authToken = localStorage.getItem("authToken");
 
   // Ici la fonction permet de modifier l'affichage de la page en fonction de si l'on est connecté ou pas (donc en fonction de si le token
   // est détecté ou non) si oui, l'on peut voir que certains élément sont afficher et d'autre non et inversement sinon
+  // ici les if (editMode) par exemple devant chaque ligne sont utiles pour vérifier si l'objet en question existe bien dans le DOM avant
+  // d'effectuer l'action
   function updateUI() {
       if (authToken) {
           if (editMode) editMode.style.display = "block"; 
@@ -285,6 +300,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**************MODALE***************/
+
+/**************GESTION DE SON AFFICHAGE**************/
+
 // Ici les nodelist permet de sélectionner les éléments qui vont nous intéresser pour l'apparition de la modale
 const modifierButton = document.querySelector('.edit');
 const ajouterPhotoButton = document.querySelector('.button__pictures');
@@ -395,41 +413,50 @@ function generateGallery(images) {
     });
 }
 
+/**************GENERATION DYNAMIQUE DE LA LISTE DES CATEGORIES****************/
 
-async function fetchAndPopulateCategories() {
+//Ici la fonction fetchListCategories va permettre de récupérer les catégories depuis l'API pour les afficher dans l'élément select comportant
+// l'id "categorie", l'async est utilisé pour attendre la réponse de l'API qui est fait juste en dessous avec le fetch, await complète cela
+// car ça permet d'attendre la réponse de l'API avant de passer à la suite, le try/catch (error) permets lui d'intercepter les potentielles
+// erreurs, comme vu précédemment et d'afficher un message d'erreur dans la console
+async function fetchListCategories() {
   try {
-      // Appel de l'API
       const response = await fetch(apiUrl);
 
-      // Vérification du succès de la requête
+      // Ici on vérifie si la response est ok, sinon, un message d'erreur est renvoyé avec le status HTTP (404 par exemple, le code de l'erreur quoi)
       if (!response.ok) {
           throw new Error(`Erreur : ${response.status}`);
       }
 
-      // Conversion de la réponse en JSON
+      // La const ici va permettre de convertir les données en JSON qui, comme vu précédemment, va les stocker et les utiliser dans le code
       const works = await response.json();
 
-      // Extraction des catégories uniques
+      // Ici, tout comme pour fetchCategories, cette partie du code va convertir les données du set en un tableau qui contiendra les noms
+      // des catégories, .map permettra ensuite de créer un objet pour chaque nom de catégorie qui sera renvoyés grâce au return avec le
+      // noms spcéifique de la catégorie et son id
       const categories = Array.from(
           new Set(works.map((work) => work.category.name))
       ).map((name) => {
           return {
               name: name,
-              id: works.find((work) => work.category.name === name).category.id, // Assurez-vous que `category.id` est disponible
+              id: works.find((work) => work.category.name === name).category.id,
           };
       });
 
-      // Sélection de l'élément select
+      // Ici on récupère l'élément select ayant l'id categorie
       const selectElement = document.getElementById('categorie');
 
-      // Suppression des options existantes
+      // l'innerHTML ici permet de vider le code présent dans le select existant directement dans le HTML pour que le contenu dynamique
+      // généré depuis l'API puisse apparaître
       selectElement.innerHTML = '';
 
-      // Création des options à partir des catégories
+      // Cette partie permets de créer l'apparition de chaque catégorie, on crée alors un élément "option" avec la const option, on lui
+      // donne une id avec option.value et un texte (qui sera et est déjà son nom) avec option.textContent et on rattache ça à l'élément
+      // créé option avec l'appendChild
       categories.forEach((category) => {
           const option = document.createElement('option');
-          option.value = category.id; // ID de la catégorie
-          option.textContent = category.name; // Nom de la catégorie
+          option.value = category.id; 
+          option.textContent = category.name;
           selectElement.appendChild(option);
       });
   } catch (error) {
@@ -437,39 +464,58 @@ async function fetchAndPopulateCategories() {
   }
 }
 
-// Appel de la fonction pour remplir le <select> au chargement de la page
-document.addEventListener('DOMContentLoaded', fetchAndPopulateCategories);
+// Cette partie permet d'écouter le chargement du DOM avec l'event listener qui écoute le DOMContentLoaded pour appeler la fonction vu
+// au dessus
+document.addEventListener('DOMContentLoaded', fetchListCategories);
 
-// Fonction pour gérer la suppression d'un travail
+/************GESTION DE LA SUPPRESSION DE TRAVAUX***************/
+
+// Ici la fonction trashIconClick (encore fonction async) va permettre d'effectuer la requête DELETE lorsqu'un click sur un trash icon
+// sera détecté, l'event listener qui va permettre d'effectuer la fonction au click se trouve unpeu plus haut (ligne 392)
 async function handleTrashIconClick(event) {
-  // Vérifie si l'élément cliqué est une icône de suppression
+  // Les console.log ont été utilisé pour vérifier certains éléments, notamment l'élément sur lequel l'utilisateur a cliqué et le fait que la
+  // fonction ai bien été appelée
   console.log(event.target);
   console.log('click')
   // if (event.target.classList.contains('trashIcon')) {
+
+      // la const va permettre de stocker l'élément cliqué dans trashIcon et le console.log nous affiche cet élément dans la console
       const trashIcon = event.target;
+
       /*const workId = trashIcon.getAttribute('data-id');*/
       console.log('trashIcon', trashIcon)
 
-      // Trouve l'élément parent contenant les informations du travail (son id)
-      const workElement = trashIcon.closest('[data-id]');
+      // ici workId va permettre de récupérer l'id de l'élément, la différence majeure avec workElement étant qu'on ne récupère que l'id ici
+      // et pas l'élément au complet
+      const workId = trashIcon.dataset.id;
+      // la const workElement ici va permettre, grâce à trashIcon.closest('[data-di]'), de trouver l'id de l'élément le plus proche du trashIcon
+      // sur lequel l'on vient de cliquer et d'attribuer cet élément à workElement, le console.log permet de vérifier que workElement a bien été trouvé
+      const workElement = /*trashIcon.closest('[data-id]');*/ document.querySelector(`[data-id="${workId}"]`);
       console.log('workElement', workElement)
 
+
+      // ici cette ligne permet de renvoyer une erreur dans la console dans le cas ou workElement n'est pas trouvé
       if (!workElement) {
           console.error("Impossible de trouver l'élément contenant le travail à supprimer.");
           return;
       }
 
-      const workId = workElement.dataset.id;
 
+      // ici on récupère le token stocker dans le localStorage qui a permis notamment pour le login et qui est nécessaire pour l'authentification
       const authToken = localStorage.getItem('authToken');
   
+      // ici on vérifie que le token est bien trouvé, si ce n'est pas le cas, alors une erreur se produit et rien ne se passe
       if (!authToken) {
         console.error("Token non trouvé.");
         return;
       }
 
       try {
-          // Envoie une requête DELETE à l'API pour supprimer le travail
+          // Ici la requête DELETE est effectué, le console.log affiche le token, l'envoi de la requête se fait avec fetch, l'URL pour celle-ci
+          // est ensuite construit avec `${apiUrl}/${workId}`, apiUrl étant l'URL de notre API et workId étant l'id de l'élément à supprimer
+          // le method permet d'indiquer que l'on envoie une requête DELETE et le headers, qui permet d'envoyer des infos supplémentaires
+          // va permettre ici de désigner une authorisation nécessitant le token, le token est ainsi envoyer, permettant à l'API de vérifier
+          // si l'utilisateur a bel et bien le droit de supprimer l'élément
           console.log(authToken);
           const response = await fetch(`${apiUrl}/${workId}`, {
               method: 'DELETE',
@@ -478,17 +524,24 @@ async function handleTrashIconClick(event) {
               }
           });
 
+          // ici le console.log va permettre d'afficher la response du serveur, le if permet de vérifier cela et ainsi dans le cas où la response
+          // n'est pas trouvé, on renvoie une erreur avec le status HTTP sous un format lisible, "Erreur lors de la suppression du travail : Not Found" par exemple
           console.log(response);
           if (!response.ok) {
               console.error("Erreur lors de la suppression du travail :", response.statusText);
               return;
           }
 
-          // Supprime le travail de la galerie de la modale
+          // ici l'élément désigné par workElement est ainsi complètement supprimé au sein du DOM grâce à .remove pour ce qui est de la modale
           workElement.remove();
 
-          // Supprime également le travail de la galerie de la page d'accueil
-          const homepageWorkElement = document.querySelector(`[data-id="${workId}"]`);
+          // ici c'est le même principe que pour workElement sauf qu'au lieu d'utiliser closest l'on cherche à savoir quel est l'élément
+          // correspondant à l'id de l'élément qui a été supprimé, celui ci est ainsi sélectionné et le if du dessous permet de vérifier
+          // donc l'existence de homepageWorkElement, et si c'est bien le cas, alors de la même manière qu'au dessus, il est retiré du DOM
+          // grâce à .remove, la différence majeure entre workElement et homepageWorkElement étant que l'un s'occupe de l'élément présent
+          // dans la modale alors que l'autre s'occupe de celui présent à la page d'accueil respectivement
+          // le console.log en dessous permet d'afficher un message confirmant la suppression de l'élément avec son id affiché
+          const homepageWorkElement = document.querySelector(`[data-id="page-${workId}"]`);
           if (homepageWorkElement) {
               homepageWorkElement.remove();
           }
@@ -497,18 +550,28 @@ async function handleTrashIconClick(event) {
       } catch (error) {
           console.error("Erreur lors de la suppression :", error);
       }
-  //}
+  // }
 }
 
-document.addEventListener('click', handleTrashIconClick);
+// document.addEventListener('click', handleTrashIconClick);
 
 fetchWorks();
+// et ici fetchWorks est encore appelé pour pouvoir actualiser les travaux présent dans le DOM une fois la suppression effectué sans avoir à 
+// recharge la page
 
+/************GESTION DE L'ENVOI DE TRAVAUX*************/
 
+// Icic les nodelist permettent de sélectionner les différents éléments, seuls 2 lignes sont différentes des autres : errorMessage permet
+// d'attribuer la class error-message à l'élément errorMessage et buttonValidate.insertAdjacentElement permet d'insérer le message d'erreur
+// représenté par errorMessage avant l'élément buttonValidate, ce qui permet d'afficher dynamiquement un message d'erreur juste au dessus
+// du bouton valider
+// seul pictureInput est une variable en let parce que l'on aura besoin par la suite, une fois un élément envoyé et le formulaire réinitialiser, 
+// de réassigner pictureInput à un nouvel élément étant donné que let est utilisé pour les variable dont la valeure pourrait changer alors 
+// que const est utilisé pour les variables dont la valeure ne changera pas
 const buttonValidate = document.querySelector('.button__validate');
 const titreInput = document.querySelector('.title');
 const categorieSelect = document.querySelector('#categorie');
-const pictureInput = document.querySelector('#add-photo');
+let pictureInput = document.querySelector('#add-photo');
 const pictureAdding = document.querySelector('.picture__adding');
 const gallery = document.querySelector('.gallery');
 const modaleGallery = document.querySelector('.galery__modale');
@@ -517,7 +580,11 @@ const errorMessage = document.createElement('p');
 errorMessage.classList.add('error-message');
 buttonValidate.insertAdjacentElement('beforebegin', errorMessage);
 
-// Fonction pour changer la couleur du bouton
+// Cette fonction va servir à changer la couleure du bouton lorsque les 3 critère sont rempli, pour ça l'on vérifie avec le if si les 3
+// critère en question (texte présent dans le titreInput, catégorie sélectionné dans categorieSelect et fichier sélectionné dans pictureInput)
+// sont rempli, en vérifiant leur valeurs avec value pour les deux premiers et avec files.lenght > 0 pour le dernier pour vérifier qu'un fichier
+// a bien été sélectionné, dans le cas où ça arrive, la couleure est alors changer juste en dessous, si ça n'est pas le cas alors rien ne se
+// passe avec else
 function updateButtonState() {
     if (titreInput.value && categorieSelect.value && pictureInput.files.length > 0) {
         buttonValidate.style.backgroundColor = '#1D6154';
@@ -526,7 +593,15 @@ function updateButtonState() {
     }
 }
 
-// Fonction pour afficher l'image dans .picture__adding
+// Ici l'on va afficher l'image que l'on sélectionne depuis nos fichiers dans pictureInput, pour ça on établi un écouteur d'évènements
+// "change" qui va permettre de détecter un changement de valeur dans notre pictureInput pour déclencher la fonction, ensuite la const file
+// va permettre de récupérer les fichiers sélectionnés grâce à pictureInput.files[0] qui permets de stocker le fichier en question et permet
+// de le récupérer sous forme d'objet, ensuite le if vérifie que l'utilisateur a bien sélectionné un fichier, dans ce cas on crée un FileReader
+// qui va permettre de lire le contenu du fichier, une fois la lecture de ce fichier terminé, reader.onload va executer la fonction qui suit
+// qui s'occupera d'implanter l'objet img directement dans le HTML avec innerHTML, e.target.result sert de source à l'objet img créé
+// car il contient l'URL de l'image, le readasDataUrl permet lui de lire le fichier pour qu'il puisse être affiché en tant qu'image
+// la fonction updateButtonState est ensuite appelé pour vérifier si tout les champs sont rempli pour savoir si oui ou non la couleure du 
+// bouton doit-elle être changée
 pictureInput.addEventListener('change', function () {
     const file = pictureInput.files[0];
     if (file) {
@@ -548,7 +623,16 @@ pictureInput.addEventListener('change', function () {
   });
 }*/
 
-// Fonction pour envoyer les données avec le token
+/**********GESTION DE LA REQUETE POST*************/
+
+// Ici l'on va s'occuper d'envoyer les données avec le token, dans la fonction data est l'objet contenant les données à envoyer, on récupère
+// ensuite le token d'authentification, si aucun token n'est trouvé cependant un message d'erreur s'affiche et la fonction s'arrête, le console.log
+// affiche les données qui sont envoyées, avec la const response on envoie une requête POST à l'API avec fetch, on précise donc que la méthode
+// est POST, et le headers, comme pour DELETE va permettre à l'API de vérifier que l'utilisateur a bien le droit d'envoyer un élément grâce
+// au token, le body contient lui les données à envoyer, celle-ci étant data, si la requête réussie alors un message s'affiche dans la console
+// sinon un message s'affiche également mais contenant une erreur avec le statut HTTP de l'erreur, la const result converti ensuite la
+// response en JSON, le console.log nous informe donc que tout s'est bien passé et nous montre les données envoyées et return result permet
+// ensuite de retourner les données pour pouvoir les réutiliser
 async function envoyerDonneesAvecToken(data) {
   const authToken = localStorage.getItem("authToken");
   if (!authToken) {
@@ -582,7 +666,8 @@ async function envoyerDonneesAvecToken(data) {
   }
 }
 
-function readFileAsBinary(file) {
+// La fonction ici va permettre ben rien enfait
+/*function readFileAsBinary(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -594,33 +679,15 @@ function readFileAsBinary(file) {
     reader.onerror = () => reject(new Error('Erreur lors de la lecture du fichier.'));
     reader.readAsDataURL(file);
   });
-}
-
-
-
-/* async function fetchWorks() {
-  try {
-      const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-              'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          }
-      });
-
-      if (!response.ok) {
-          throw new Error(`Erreur lors de la récupération des données : ${response.status}`);
-      }
-
-      const works = await response.json();
-
-      generateGallery(works);
-      afficherWorks(works);
-  } catch (error) {
-      console.error('Erreur lors de la mise à jour de la galerie :', error);
-  }
 }*/
 
-// Fonction pour gérer l'envoi du formulaire
+
+/**************ENVOI DES INFOS DU FORMULAIRE ET REINITIALISATION DE CELUI CI APRES COUP***************/
+
+// Alors que la fonction du dessus s'occupe d'envoyer les données avec le token, ici l'on va s'occuper d'envoyer les infos présent dans
+// le formulaire, un event listener au click est alors établi sur buttonValidate pour l'execution de la fonction qui suit, les console.log
+// s'occupe d'afficher dans la console l'élément HTML et le fichier sélectionné, avec les const on stocke le texte entré dans l'input, la catégorie
+// sélectionné et le fichier image sélectionné
 buttonValidate.addEventListener('click', async function () {
   console.log('Référence actuelle de pictureInput :', pictureInput);
   console.log('Fichier sélectionné :', pictureInput.files[0]);
@@ -629,14 +696,16 @@ buttonValidate.addEventListener('click', async function () {
     const categorie = categorieSelect.value;
     const image = pictureInput.files[0];
 
-    // Vérification si tout est rempli
+    // Dans le cas où un des 3 manque à l'appel, alors un message d'erreur de couleure rouge est affiché directement dans le HTML et la fonction
+    // s'arrête
     if (!titre || !categorie || !image) {
         errorMessage.textContent = 'Veuillez remplir tous les champs et ajouter une image.';
         errorMessage.style.color = 'red';
         return;
     }
 
-    // Création de l'objet FormData
+    // On crée ensuite l'objet FormData qui permettra d'envoyer des données au format "multipart/form data" nécessaire pour envoyer les
+    // fichiers, et on rattache chaque élémént (titre, catégorie et image) au formData avec append
     const formData = new FormData();
     formData.append('title', titre);
     formData.append('category', categorie);
@@ -644,7 +713,9 @@ buttonValidate.addEventListener('click', async function () {
         
 
     try {  
-      // Envoyer les données
+      // On envoie ensuite ainsi ces données (de formData) à l'API en faisant appel à la fonction définie précédemment, si l'on a bien un
+      // result alors un message de confirmation est affiché dans la console et la fonction chargerGalerie est appelée pour mettre à jour
+      // les galeries d'images
       const result = await envoyerDonneesAvecToken(formData);
       if (result) {
         console.log('Envoi réussi, mise à jour de l\'UI...');
@@ -659,7 +730,9 @@ buttonValidate.addEventListener('click', async function () {
         return;
     }*/
 
-    // Réinitialisation du formulaire
+    // Ici on réinitialise le formulaire après envoi, pour ça l'on ne mets rien entre les '', ce qui permets de vider ce qui s'y trouvais
+    // pictureAdding.innerHTML permet de faire revenir le pictureAdding à la normal (qui avais été remplacé par une image comme vu précédemment)
+    // le potentiel message d'erreur affiché disparait et la couleure du bouton valider revient à la normale
     titreInput.value = '';
     pictureInput.value = '';
     pictureAdding.innerHTML = '<i class="fa-regular fa-image"></i><label for="add-photo">+ Ajouter une photo</label><input type="file" name="add-photo" id="add-photo"><p>jpg, png : 4mo max</p>';
@@ -667,15 +740,20 @@ buttonValidate.addEventListener('click', async function () {
     buttonValidate.style.backgroundColor = '';
     errorMessage.textContent = '';
 
-    const newPictureInput = document.querySelector('#add-photo');
+    // Ici on remets à jour pictureInput étant donné que sa valeure a changé puisqu'on l'a remis à 0 comme vu au dessus, ça ne pose cependant
+    // pas de problème car, comme vu plus haut, la variable pictureInput était défini dès le départ en let
+    pictureInput = document.querySelector('#add-photo');
 
-    if (!newPictureInput) {
+    // ici si pictureInput n'a pas été correctement recréé, alors un message d'erreur est affiché et la fonction s'arrête
+    if (!pictureInput) {
       console.error("L'élément #add-photo n'a pas été trouvé !");
       return;
     }
 
-    newPictureInput.addEventListener('change', function () {
-      const file = newPictureInput.files[0];
+    // Ici l'on refait ce que l'on avait fait plus haut pour que lorsque l'utilisateur sélectionne une nouvelle image, alors le même comportement
+    // se produit que plus haut
+    pictureInput.addEventListener('change', function () {
+      const file = pictureInput.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = function (e) {
@@ -686,231 +764,14 @@ buttonValidate.addEventListener('click', async function () {
       updateButtonState();
     });
 
+  // on refait appel à updateButtonState pour vérifier que tout les champs ont été rempli et pour savoir si la couleure du bouton doit être
+  // changée ou non
   updateButtonState();
 });
 
-// Mise à jour de l'état du bouton à chaque modification
+// Ces deux dernières lignes permettent d'écouter des changements, titreInput écoute si quelque chose est tapé dans son input et pictureInput
+// écoute si un fichier est sélectionné dans le pictureInput, les deux appellent ensuite updateButtonState pour vérifier l'état du bouton
+// et ainsi le changer ou non
 titreInput.addEventListener('input', updateButtonState);
 // categorieSelect.addEventListener('change', updateButtonState);
 pictureInput.addEventListener('change', updateButtonState);
-
-
-/*buttonValidate.addEventListener('click', async function () {
-  console.log('Référence actuelle de pictureInput :', pictureInput);
-  console.log('Fichier sélectionné :', pictureInput.files[0]);
-
-  const titre = titreInput.value;
-  const categorie = categorieSelect.value;
-  const image = pictureInput.files[0];
-
-  // Vérification si tout est rempli
-  if (!titre || !categorie || !image) {
-    errorMessage.textContent = 'Veuillez remplir tous les champs et ajouter une image.';
-    errorMessage.style.color = 'red';
-    return;
-  }
-
-  // Création de l'objet FormData
-  const formData = new FormData();
-  formData.append('title', titre);
-  formData.append('category', categorie);
-  formData.append('image', image);
-
-  try {
-    // Envoyer les données
-    const result = await envoyerDonneesAvecToken(formData);
-    if (result) {
-      console.log('Envoi réussi, mise à jour de l\'UI...');
-      await chargerGalerie();
-    }
-  } catch (error) {
-    console.error('Erreur lors du traitement de l\'image ou de l\'envoi des données :', error);
-  }
-
-  // Réinitialisation du formulaire
-  titreInput.value = '';
-  pictureInput.value = '';
-  pictureAdding.innerHTML = `
-    <i class="fa-regular fa-image"></i>
-    <label for="add-photo">+ Ajouter une photo</label>
-    <input type="file" name="add-photo" id="add-photo">
-    <p>jpg, png : 4mo max</p>
-  `;
-  buttonValidate.style.backgroundColor = '';
-  errorMessage.textContent = '';
-
-  // Récupérer le nouvel input et réassigner les listeners
-  const newPictureInput = document.querySelector('#add-photo');
-  newPictureInput.addEventListener('change', function () {
-    const file = newPictureInput.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
-      };
-      reader.readAsDataURL(file);
-    }
-    updateButtonState();
-  });
-
-  // Réattacher les listeners pour updateButtonState
-  titreInput.addEventListener('input', updateButtonState);
-  categorieSelect.addEventListener('change', updateButtonState);
-  newPictureInput.addEventListener('change', updateButtonState);
-});*/
-
-// Attache un écouteur sur un parent stable pour les clics
-/*document.addEventListener('click', async function (event) {
-  // Vérifie si l'élément cliqué est le bouton de validation
-  if (event.target === buttonValidate) {
-    console.log('Référence actuelle de pictureInput :', pictureInput);
-    console.log('Fichier sélectionné :', pictureInput.files[0]);
-
-    const titre = titreInput.value;
-    const categorie = categorieSelect.value;
-    const image = pictureInput.files[0];
-
-    // Vérification si tout est rempli
-    if (!titre || !categorie || !image) {
-      errorMessage.textContent = 'Veuillez remplir tous les champs et ajouter une image.';
-      errorMessage.style.color = 'red';
-      return;
-    }
-
-    // Création de l'objet FormData
-    const formData = new FormData();
-    formData.append('title', titre);
-    formData.append('category', categorie);
-    formData.append('image', image);
-
-    try {
-      // Envoyer les données
-      const result = await envoyerDonneesAvecToken(formData);
-      if (result) {
-        console.log('Envoi réussi, mise à jour de l\'UI...');
-        await chargerGalerie();
-      }
-    } catch (error) {
-      console.error('Erreur lors du traitement de l\'image ou de l\'envoi des données :', error);
-    }
-
-    // Réinitialisation du formulaire
-    titreInput.value = '';
-    pictureInput.value = '';
-    pictureAdding.innerHTML = `
-      <i class="fa-regular fa-image"></i>
-      <label for="add-photo">+ Ajouter une photo</label>
-      <input type="file" name="add-photo" id="add-photo">
-      <p>jpg, png : 4mo max</p>
-    `;
-    buttonValidate.style.backgroundColor = '';
-    errorMessage.textContent = '';
-
-    // Récupérer la nouvelle référence de pictureInput après la modification du DOM
-    const newPictureInput = document.querySelector('#add-photo');
-
-    // Réattacher l'event listener pour le changement de photo
-    newPictureInput.addEventListener('change', function () {
-      const file = newPictureInput.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
-        };
-        reader.readAsDataURL(file);
-      }
-      updateButtonState();
-    });
-
-    // Réattacher le listener pour updateButtonState
-    titreInput.addEventListener('input', updateButtonState);
-    categorieSelect.addEventListener('change', updateButtonState);
-    newPictureInput.addEventListener('change', updateButtonState);
-  }
-});
-
-// Attache un écouteur sur un parent stable pour les changements sur l'input file
-document.addEventListener('change', function (event) {
-  // Vérifie si l'élément changé est l'input file
-  if (event.target && event.target.id === 'add-photo') {
-    const newPictureInput = event.target;
-    const file = newPictureInput.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
-      };
-      reader.readAsDataURL(file);
-    }
-    updateButtonState();
-  }
-});
-
-// Attache des écouteurs sur les champs de saisie pour mettre à jour l'état du bouton
-document.addEventListener('input', function (event) {
-  if (event.target === titreInput || event.target === categorieSelect || event.target === pictureInput) {
-    updateButtonState();
-  }
-});*/
-
-/*buttonValidate.addEventListener('click', async function () {
-  console.log('Référence actuelle de pictureInput :', pictureInput);
-  console.log('Fichier sélectionné :', pictureInput.files[0]);
-
-  const titre = titreInput.value;
-  const categorie = categorieSelect.value;
-  const image = pictureInput.files[0];
-
-  // Vérification si tout est rempli
-  if (!titre || !categorie || !image) {
-    errorMessage.textContent = 'Veuillez remplir tous les champs et ajouter une image.';
-    errorMessage.style.color = 'red';
-    return;
-  }
-
-  // Création de l'objet FormData
-  const formData = new FormData();
-  formData.append('title', titre);
-  formData.append('category', categorie);
-  formData.append('image', image);
-
-  try {
-    // Envoyer les données
-    const result = await envoyerDonneesAvecToken(formData);
-    if (result) {
-      console.log('Envoi réussi, mise à jour de l\'UI...');
-      await chargerGalerie();
-    }
-  } catch (error) {
-    console.error('Erreur lors du traitement de l\'image ou de l\'envoi des données :', error);
-  }
-
-  // Réinitialisation du formulaire
-  titreInput.value = '';
-  pictureInput.value = '';
-
-  // Modification du contenu sans recréer l'élément
-  pictureAdding.innerHTML = '<i class="fa-regular fa-image"></i><label for="add-photo">+ Ajouter une photo</label><input type="file" name="add-photo" id="add-photo"><p>jpg, png : 4mo max</p>';
-
-  // Attacher un événement à l'input file (sans recréer l'élément)
-  const newPictureInput = document.querySelector('#add-photo');
-  newPictureInput.addEventListener('change', function () {
-    const file = newPictureInput.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        pictureAdding.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée">`;
-      };
-      reader.readAsDataURL(file);
-    }
-    updateButtonState();
-  });
-
-  buttonValidate.style.backgroundColor = '';
-  errorMessage.textContent = '';
-});
-
-// Mise à jour de l'état du bouton à chaque modification
-titreInput.addEventListener('input', updateButtonState);
-// categorieSelect.addEventListener('change', updateButtonState);
-pictureInput.addEventListener('change', updateButtonState);*/
